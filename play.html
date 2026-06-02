@@ -1,3 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Exposure Vault</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#111;
+    color:#fff;
+    padding:20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.hidden{
+    display:none !important;
+}
+
+.card{
+    background:#1c1c1c;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.center{
+    text-align:center;
+}
+
+img{
+    width:100%;
+    border-radius:10px;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.primary{
+    background:#00b894;
+    color:white;
+}
+
+.primary:hover{
+    background:#00a383;
+}
+
+.coverImage{
+    max-height:650px;
+    object-fit:cover;
+}
+
+.previewImage{
+    height:400px;
+    object-fit:cover;
+    transition:filter .4s ease;
+}
+
+.revealImage{
+    max-height:700px;
+    object-fit:contain;
+}
+
+.stageTitle{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.difficulty{
+    text-align:center;
+    color:#999;
+    text-transform:uppercase;
+    margin-bottom:20px;
+}
+
+.passwordDisplay{
+    text-align:center;
+    font-size:42px;
+    font-weight:bold;
+    letter-spacing:8px;
+    margin-top:20px;
+    word-break:break-word;
+}
+
+.alarmContainer{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:20px;
+}
+
+.alarm{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#ff3b3b;
+
+    box-shadow:
+        0 0 8px #ff3b3b,
+        0 0 16px #ff3b3b,
+        0 0 24px #ff3b3b;
+}
+
+.codeDisplay{
+    margin-top:25px;
+    text-align:center;
+    font-size:42px;
+    font-weight:bold;
+    letter-spacing:12px;
+    min-height:55px;
+}
+
+.progressBar{
+    margin-top:20px;
+    height:10px;
+    background:#333;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.progressFill{
+    height:100%;
+    width:0%;
+    background:#00b894;
+}
+
+.keypad{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.keypad button{
+    padding:18px;
+    font-size:24px;
+}
+
+.numberBtn{
+    background:#333;
+    color:white;
+}
+
+.numberBtn:hover{
+    background:#444;
+}
+
+.clearBtn{
+    background:#555;
+    color:white;
+}
+
+.hackBtn{
+    background:#00b894;
+    color:white;
+}
+
+.resultBox{
+    margin-top:20px;
+    min-height:40px;
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.history{
+    margin-top:25px;
+}
+
+.history h3{
+    margin-bottom:10px;
+}
+
+.historyList{
+    background:#222;
+    border-radius:10px;
+    padding:15px;
+    max-height:250px;
+    overflow-y:auto;
+}
+
+.historyEntry{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-family:monospace;
+    font-size:18px;
+}
+
+.gallery{
+    display:grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(140px,1fr)
+        );
+
+    gap:10px;
+    margin-top:20px;
+}
+
+.gallery img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.hints{
+    display:flex;
+    gap:6px;
+    justify-content:center;
+}
+
+.hint{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+}
+
+.green{
+    background:#2ecc71;
+}
+
+.yellow{
+    background:#f1c40f;
+}
+
+.grey{
+    background:#666;
+}
+
+</style>
+</head>
 <body>
 
 <div class="container">
@@ -30,7 +280,11 @@
 
         <button
             class="primary"
-            style="width:100%;padding:18px;font-size:22px;"
+            style="
+                width:100%;
+                padding:18px;
+                font-size:22px;
+            "
             onclick="startGame()">
 
             Begin Exposure
@@ -89,6 +343,16 @@
 
             </div>
 
+            <div class="progressBar">
+
+                <div
+                    id="progressFill"
+                    class="progressFill">
+
+                </div>
+
+            </div>
+
             <div class="keypad">
 
                 <button
@@ -140,6 +404,7 @@
                     onclick="pressDigit('0')">0</button>
 
                 <button
+                    id="hackButton"
                     class="hackBtn"
                     onclick="hack()">
 
@@ -211,7 +476,11 @@
 
         <button
             class="primary"
-            style="width:100%;padding:18px;font-size:22px;"
+            style="
+                width:100%;
+                padding:18px;
+                font-size:22px;
+            "
             onclick="continueAfterReveal()">
 
             Continue
@@ -233,7 +502,7 @@
         <br>
 
         <p>
-            The vault has reset.
+            The vault has been reset.
         </p>
 
         <br>
@@ -252,7 +521,11 @@
 
         <button
             class="primary"
-            style="width:100%;padding:18px;font-size:22px;"
+            style="
+                width:100%;
+                padding:18px;
+                font-size:22px;
+            "
             onclick="continueAfterReset()">
 
             Retry Stage
@@ -299,3 +572,4 @@
 <script src="js/play.js"></script>
 
 </body>
+</html>
