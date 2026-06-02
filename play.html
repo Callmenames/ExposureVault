@@ -62,15 +62,6 @@ button{
     background:#00a383;
 }
 
-.secondary{
-    background:#444;
-    color:white;
-}
-
-.secondary:hover{
-    background:#555;
-}
-
 img{
     max-width:100%;
     border-radius:10px;
@@ -84,20 +75,8 @@ img{
     font-size:20px;
 }
 
-.progressBar{
-    width:100%;
-    height:24px;
-    background:#333;
-    border-radius:999px;
-    overflow:hidden;
-    margin-top:10px;
-}
-
-.progressFill{
-    height:100%;
-    width:100%;
-    background:#00b894;
-    transition:width .3s;
+#pinDisplay{
+    font-size:28px;
 }
 
 #wheelWrapper{
@@ -109,7 +88,7 @@ img{
 
 #wheelPointer{
     position:absolute;
-    top:-10px;
+    top:-15px;
     left:50%;
     transform:translateX(-50%);
     z-index:10;
@@ -121,6 +100,7 @@ img{
     height:340px;
     border-radius:50%;
     border:8px solid #444;
+
     transition:
         transform 4s
         cubic-bezier(
@@ -135,8 +115,75 @@ img{
     margin-top:20px;
     font-size:24px;
     font-weight:bold;
-    text-align:center;
-    min-height:30px;
+    min-height:40px;
+}
+
+#legend{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            1fr
+        );
+
+    gap:10px;
+
+    margin-top:20px;
+
+    text-align:left;
+
+}
+
+.legendItem{
+
+    display:flex;
+    align-items:center;
+
+    background:#222;
+
+    padding:10px;
+
+    border-radius:8px;
+
+}
+
+.legendColor{
+
+    width:18px;
+    height:18px;
+
+    border-radius:4px;
+
+    margin-right:10px;
+
+    flex-shrink:0;
+
+}
+
+.legendRed{
+    background:#e74c3c;
+}
+
+.legendGold{
+    background:#f1c40f;
+}
+
+.legendBlue{
+    background:#3498db;
+}
+
+.legendGreen{
+    background:#27ae60;
+}
+
+.legendLightGreen{
+    background:#2ecc71;
+}
+
+.legendGrey{
+    background:#7f8c8d;
 }
 
 .gallery{
@@ -156,9 +203,12 @@ img{
 }
 
 .bigImage{
-    max-height:70vh;
-    width:auto;
     max-width:100%;
+    max-height:75vh;
+}
+
+#difficultyDisplay{
+    font-weight:bold;
 }
 
 </style>
@@ -183,7 +233,9 @@ img{
     id="coverScreen"
     class="card center hidden">
 
-    <h1>Vault Cracker</h1>
+    <h1>
+        Vault Cracker
+    </h1>
 
     <br>
 
@@ -218,22 +270,28 @@ img{
         <div class="statRow">
 
             <span>
-                Pins Remaining
+                Difficulty
             </span>
 
-            <span id="pinsRemaining">
-                0
+            <span id="difficultyDisplay">
+
+                EASY
+
             </span>
 
         </div>
 
-        <div class="progressBar">
+        <div class="statRow">
 
-            <div
-                id="pinProgress"
-                class="progressFill">
+            <span>
+                Pins Remaining
+            </span>
 
-            </div>
+            <span id="pinDisplay">
+
+                🔑🔑🔑🔑🔑
+
+            </span>
 
         </div>
 
@@ -244,7 +302,9 @@ img{
             </span>
 
             <span id="livesDisplay">
+
                 ❤❤❤
+
             </span>
 
         </div>
@@ -256,7 +316,9 @@ img{
             </span>
 
             <span id="shieldDisplay">
+
                 None
+
             </span>
 
         </div>
@@ -264,11 +326,13 @@ img{
         <div class="statRow">
 
             <span>
-                Spin Timer
+                Spins Remaining
             </span>
 
-            <span id="timerDisplay">
-                0 / 0
+            <span id="spinsDisplay">
+
+                0
+
             </span>
 
         </div>
@@ -305,6 +369,84 @@ img{
         <div
             id="resultBox"
             class="resultBox">
+
+        </div>
+
+        <!-- Legend -->
+
+        <div id="legend">
+
+            <div class="legendItem">
+
+                <span
+                    class="
+                    legendColor
+                    legendGold">
+                </span>
+
+                Pin Crack
+
+            </div>
+
+            <div class="legendItem">
+
+                <span
+                    class="
+                    legendColor
+                    legendRed">
+                </span>
+
+                Lose Life
+
+            </div>
+
+            <div class="legendItem">
+
+                <span
+                    class="
+                    legendColor
+                    legendBlue">
+                </span>
+
+                Shield
+
+            </div>
+
+            <div class="legendItem">
+
+                <span
+                    class="
+                    legendColor
+                    legendGreen">
+                </span>
+
+                +2 Spins
+
+            </div>
+
+            <div class="legendItem">
+
+                <span
+                    class="
+                    legendColor
+                    legendLightGreen">
+                </span>
+
+                +5 Spins
+
+            </div>
+
+            <div class="legendItem">
+
+                <span
+                    class="
+                    legendColor
+                    legendGrey">
+                </span>
+
+                Spin Again
+
+            </div>
 
         </div>
 
@@ -382,7 +524,7 @@ img{
 
     <p>
 
-        This vault layer has reset.
+        The vault has reset.
 
     </p>
 
