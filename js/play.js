@@ -2,24 +2,31 @@ let vaultData;
 
 try{
 
-    vaultData = JSON.parse(
+    const json =
         LZString.decompressFromEncodedURIComponent(
             location.hash.substring(1)
-        )
-    );
+        );
+
+    vaultData =
+        JSON.parse(json);
 
 }catch(error){
 
-    console.error(
-        "Invalid vault data",
-        error
-    );
+    document.body.innerHTML =
+        `
+        <div style="
+            color:white;
+            padding:20px;
+            font-family:Arial;
+        ">
+            ERROR:<br><br>
+            ${error}
+        </div>
+        `;
+
+    throw error;
 
 }
-
-console.log(
-    "script loaded"
-);
 
 let currentStageIndex = 0;
 
