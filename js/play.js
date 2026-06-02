@@ -96,21 +96,6 @@ const wheelColors = {
 
 };
 
-const wheelLabels = {
-
-    CRACK:"PIN",
-
-    LOSE_LIFE:"LIFE",
-
-    SHIELD:"SHIELD",
-
-    PLUS_2:"+2",
-
-    PLUS_5:"+5",
-
-    SPIN_AGAIN:"SPIN"
-
-};
 
 let currentStage = 0;
 
@@ -592,24 +577,6 @@ function drawWheel(){
 
         ctx.stroke();
 
-        drawSegmentLabel(
-
-            ctx,
-
-            segment,
-
-            start,
-
-            end,
-
-            centerX,
-
-            centerY,
-
-            radius
-
-        );
-
     }
 
     ctx.beginPath();
@@ -636,17 +603,7 @@ function drawWheel(){
 
 }
 
-function drawSegmentLabel(
-
-    ctx,
-    segment,
-    start,
-    end,
-    centerX,
-    centerY,
-    radius
-
-){
+{
 
     const angle =
 
@@ -754,15 +711,24 @@ function spinWheel(){
         /
         currentWheelLayout.length;
 
-    const targetRotation =
-
-        360
-        -
-        (
-            resultIndex
-            *
-            segmentSize
-        );
+      const segmentCenter =
+      
+          (
+              resultIndex
+              *
+              segmentSize
+          )
+          +
+          (
+              segmentSize
+              / 2
+          );
+      
+      const targetRotation =
+      
+          270
+          -
+          segmentCenter;
 
     currentRotation +=
 
