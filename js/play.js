@@ -1,3 +1,9 @@
+/* =====================================================
+   VAULT CRACKER
+   PART 1
+   Core State / Save System / Stage Loading
+===================================================== */
+
 let gameData = null;
 
 const STORAGE_KEY =
@@ -8,19 +14,19 @@ const difficulties = {
     easy:{
         pins:5,
         lives:5,
-        spinTimer:10
+        spins:10
     },
 
     medium:{
         pins:10,
         lives:3,
-        spinTimer:8
+        spins:8
     },
 
     hard:{
         pins:18,
         lives:2,
-        spinTimer:6
+        spins:6
     }
 
 };
@@ -74,23 +80,58 @@ const wheels = [
 
 ];
 
+const wheelColors = {
+
+    CRACK:"#f1c40f",
+
+    LOSE_LIFE:"#e74c3c",
+
+    SHIELD:"#3498db",
+
+    PLUS_2:"#27ae60",
+
+    PLUS_5:"#2ecc71",
+
+    SPIN_AGAIN:"#7f8c8d"
+
+};
+
+const wheelLabels = {
+
+    CRACK:"PIN",
+
+    LOSE_LIFE:"LIFE",
+
+    SHIELD:"SHIELD",
+
+    PLUS_2:"+2",
+
+    PLUS_5:"+5",
+
+    SPIN_AGAIN:"SPIN"
+
+};
+
 let currentStage = 0;
 
-let pinsRemaining = 0;
 let maxPins = 0;
+let pinsRemaining = 0;
 
-let lives = 0;
 let maxLives = 0;
+let lives = 0;
 
-let timer = 0;
-let maxTimer = 0;
+let maxSpins = 0;
+let spinsRemaining = 0;
 
 let shield = false;
 
 let unlockedImages = [];
 
-let currentRotation = 0;
+let currentWheelLayout = [];
+
 let spinning = false;
+
+let currentRotation = 0;
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -110,6 +151,7 @@ function init(){
         document.getElementById(
             "loadingScreen"
         ).innerHTML =
+
         "<h2>No vault data found.</h2>";
 
         return;
@@ -119,23 +161,29 @@ function init(){
     try{
 
         const json =
-            LZString.decompressFromEncodedURIComponent(
+            LZString
+            .decompressFromEncodedURIComponent(
                 hash
             );
 
         gameData =
-            JSON.parse(json);
+            JSON.parse(
+                json
+            );
 
         loadProgress();
 
     }
     catch(err){
 
-        console.error(err);
+        console.error(
+            err
+        );
 
         document.getElementById(
             "loadingScreen"
         ).innerHTML =
+
         "<h2>Invalid vault link.</h2>";
 
     }
@@ -154,7 +202,9 @@ function loadProgress(){
         try{
 
             const data =
-                JSON.parse(save);
+                JSON.parse(
+                    save
+                );
 
             if(
                 data.hash ===
@@ -164,23 +214,23 @@ function loadProgress(){
                 currentStage =
                     data.currentStage;
 
-                pinsRemaining =
-                    data.pinsRemaining;
-
                 maxPins =
                     data.maxPins;
 
-                lives =
-                    data.lives;
+                pinsRemaining =
+                    data.pinsRemaining;
 
                 maxLives =
                     data.maxLives;
 
-                timer =
-                    data.timer;
+                lives =
+                    data.lives;
 
-                maxTimer =
-                    data.maxTimer;
+                maxSpins =
+                    data.maxSpins;
+
+                spinsRemaining =
+                    data.spinsRemaining;
 
                 shield =
                     data.shield;
@@ -191,21 +241,23 @@ function loadProgress(){
             }
 
         }
-        catch(e){}
+        catch(err){
+
+            console.log(
+                err
+            );
+
+        }
 
     }
 
-    document
-        .getElementById(
-            "loadingScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
+    document.getElementById(
+        "loadingScreen"
+    ).classList.add(
+        "hidden"
+    );
 
     if(
-        currentStage === 0 &&
-        unlockedImages.length === 0 &&
         maxPins === 0
     ){
 
@@ -233,17 +285,17 @@ function saveProgress(){
 
             currentStage,
 
-            pinsRemaining,
-
             maxPins,
 
-            lives,
+            pinsRemaining,
 
             maxLives,
 
-            timer,
+            lives,
 
-            maxTimer,
+            maxSpins,
+
+            spinsRemaining,
 
             shield,
 
@@ -257,37 +309,32 @@ function saveProgress(){
 
 function showCover(){
 
-    document
-        .getElementById(
-            "coverScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    document.getElementById(
+        "coverScreen"
+    ).classList.remove(
+        "hidden"
+    );
 
-    document
-        .getElementById(
-            "coverImage"
-        )
-        .src =
+    document.getElementById(
+        "coverImage"
+    ).src =
         gameData.cover;
 
 }
 
 function startGame(){
 
-    document
-        .getElementById(
-            "coverScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
     currentStage = 0;
+
     unlockedImages = [];
 
     loadStage();
+
+    document.getElementById(
+        "coverScreen"
+    ).classList.add(
+        "hidden"
+    );
 
     startGameUI();
 
@@ -295,19 +342,17 @@ function startGame(){
 
 function startGameUI(){
 
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-    drawWheel();
+    document.getElementById(
+        "gameScreen"
+    ).classList.remove(
+        "hidden"
+    );
 
     updateUI();
 
     renderGallery();
+
+    drawWheel();
 
 }
 
@@ -335,15 +380,25 @@ function loadStage(){
     lives =
         settings.lives;
 
-    maxTimer =
-        settings.spinTimer;
+    maxSpins =
+        settings.spins;
 
-    timer =
-        settings.spinTimer;
+    spinsRemaining =
+        settings.spins;
 
     shield = false;
 
-    drawWheel();
+    currentWheelLayout =
+        shuffleArray(
+
+            wheels[
+                Math.min(
+                    currentStage,
+                    4
+                )
+            ]
+
+        );
 
     saveProgress();
 
@@ -362,22 +417,23 @@ function updateUI(){
         }`;
 
     document.getElementById(
-        "pinsRemaining"
+        "difficultyDisplay"
     ).textContent =
-        pinsRemaining;
+
+        gameData
+        .stages[
+            currentStage
+        ]
+        .difficulty
+        .toUpperCase();
 
     document.getElementById(
-        "pinProgress"
-    ).style.width =
+        "pinDisplay"
+    ).textContent =
 
-        (
-            (
-                maxPins -
-                pinsRemaining
-            )
-            /
-            maxPins
-        ) * 100 + "%";
+        "🔑".repeat(
+            pinsRemaining
+        );
 
     document.getElementById(
         "livesDisplay"
@@ -396,12 +452,56 @@ function updateUI(){
         : "None";
 
     document.getElementById(
-        "timerDisplay"
+        "spinsDisplay"
     ).textContent =
 
-        `${timer} / ${maxTimer}`;
+        spinsRemaining;
 
 }
+
+function shuffleArray(array){
+
+    const arr = [...array];
+
+    for(
+
+        let i =
+            arr.length - 1;
+
+        i > 0;
+
+        i--
+
+    ){
+
+        const j =
+
+            Math.floor(
+                Math.random()
+                *
+                (i + 1)
+            );
+
+        [
+            arr[i],
+            arr[j]
+        ] = [
+
+            arr[j],
+            arr[i]
+
+        ];
+
+    }
+
+    return arr;
+
+}
+
+/* =====================================================
+   PART 2
+   Wheel Rendering / Animation / Spin Logic
+===================================================== */
 
 function drawWheel(){
 
@@ -415,95 +515,200 @@ function drawWheel(){
             "2d"
         );
 
-    const wheelData =
-        wheels[
-            Math.min(
-                currentStage,
-                4
-            )
-        ];
+    const width =
+        canvas.width;
 
-    const center = 170;
+    const height =
+        canvas.height;
+
+    const centerX =
+        width / 2;
+
+    const centerY =
+        height / 2;
 
     const radius = 160;
 
     ctx.clearRect(
         0,
         0,
-        340,
-        340
+        width,
+        height
     );
 
-    const angle =
+    const segmentCount =
+        currentWheelLayout.length;
+
+    const segmentAngle =
         (Math.PI * 2)
         /
-        wheelData.length;
+        segmentCount;
 
     for(
-        let i=0;
-        i<wheelData.length;
+        let i = 0;
+        i < segmentCount;
         i++
     ){
+
+        const segment =
+            currentWheelLayout[i];
+
+        const start =
+            i *
+            segmentAngle;
+
+        const end =
+            start +
+            segmentAngle;
 
         ctx.beginPath();
 
         ctx.moveTo(
-            center,
-            center
+            centerX,
+            centerY
         );
 
         ctx.arc(
-            center,
-            center,
+            centerX,
+            centerY,
             radius,
-            i * angle,
-            (i + 1) * angle
+            start,
+            end
         );
 
-        let color =
-            "#00b894";
-
-        if(
-            wheelData[i] ===
-            "LOSE_LIFE"
-        ){
-            color = "#c0392b";
-        }
-
-        else if(
-            wheelData[i] ===
-            "SHIELD"
-        ){
-            color = "#2980b9";
-        }
-
-        else if(
-            wheelData[i] ===
-            "PLUS_5"
-        ){
-            color = "#f1c40f";
-        }
-
-        else if(
-            wheelData[i] ===
-            "PLUS_2"
-        ){
-            color = "#9b59b6";
-        }
-
-        else if(
-            wheelData[i] ===
-            "SPIN_AGAIN"
-        ){
-            color = "#e67e22";
-        }
+        ctx.closePath();
 
         ctx.fillStyle =
-            color;
+            wheelColors[
+                segment
+            ];
 
         ctx.fill();
 
+        ctx.strokeStyle =
+            "#111";
+
+        ctx.lineWidth = 2;
+
+        ctx.stroke();
+
+        drawSegmentLabel(
+
+            ctx,
+
+            segment,
+
+            start,
+
+            end,
+
+            centerX,
+
+            centerY,
+
+            radius
+
+        );
+
     }
+
+    ctx.beginPath();
+
+    ctx.arc(
+        centerX,
+        centerY,
+        25,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle =
+        "#222";
+
+    ctx.fill();
+
+    ctx.strokeStyle =
+        "#555";
+
+    ctx.lineWidth = 4;
+
+    ctx.stroke();
+
+}
+
+function drawSegmentLabel(
+
+    ctx,
+    segment,
+    start,
+    end,
+    centerX,
+    centerY,
+    radius
+
+){
+
+    const angle =
+
+        (
+            start +
+            end
+        ) / 2;
+
+    const x =
+
+        centerX +
+
+        Math.cos(
+            angle
+        ) *
+
+        (radius * 0.68);
+
+    const y =
+
+        centerY +
+
+        Math.sin(
+            angle
+        ) *
+
+        (radius * 0.68);
+
+    ctx.save();
+
+    ctx.translate(
+        x,
+        y
+    );
+
+    ctx.rotate(
+        angle +
+        Math.PI / 2
+    );
+
+    ctx.fillStyle =
+        "#000";
+
+    ctx.font =
+        "bold 11px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.fillText(
+
+        wheelLabels[
+            segment
+        ],
+
+        0,
+
+        0
+
+    );
+
+    ctx.restore();
 
 }
 
@@ -515,66 +720,87 @@ function spinWheel(){
 
     spinning = true;
 
+    document
+        .getElementById(
+            "spinButton"
+        )
+        .disabled = true;
+
     const wheel =
         document.getElementById(
             "wheel"
         );
 
-    const wheelData =
-        wheels[
-            Math.min(
-                currentStage,
-                4
-            )
-        ];
-
     const resultIndex =
+
         Math.floor(
+
             Math.random()
+
             *
-            wheelData.length
+            currentWheelLayout.length
+
         );
 
     const result =
-        wheelData[
+
+        currentWheelLayout[
             resultIndex
         ];
 
     const segmentSize =
-        360 /
-        wheelData.length;
+
+        360
+        /
+        currentWheelLayout.length;
+
+    const targetRotation =
+
+        360
+        -
+        (
+            resultIndex
+            *
+            segmentSize
+        );
 
     currentRotation +=
 
         1440 +
 
-        (
-            360 -
-            (
-                resultIndex
-                *
-                segmentSize
-            )
-        );
+        targetRotation;
 
     wheel.style.transform =
+
         `rotate(${currentRotation}deg)`;
 
-    setTimeout(()=>{
+    setTimeout(
 
-        applyResult(
-            result
-        );
+        ()=>{
 
-        spinning = false;
+            resolveSpin(
+                result
+            );
 
-    },4000);
+            spinning = false;
+
+            document
+                .getElementById(
+                    "spinButton"
+                )
+                .disabled = false;
+
+        },
+
+        4000
+
+    );
 
 }
 
-function applyResult(result){
+function resolveSpin(result){
 
-    timer--;
+    spinsRemaining--;
 
     let message = "";
 
@@ -585,7 +811,7 @@ function applyResult(result){
             pinsRemaining--;
 
             message =
-                "Pin Cracked";
+                "🔓 Pin Cracked";
 
             break;
 
@@ -594,32 +820,32 @@ function applyResult(result){
             shield = true;
 
             message =
-                "Shield Activated";
+                "🛡 Shield Activated";
 
             break;
 
         case "PLUS_2":
 
-            timer += 2;
+            spinsRemaining += 2;
 
             message =
-                "+2 Spins";
+                "➕ 2 Spins";
 
             break;
 
         case "PLUS_5":
 
-            timer += 5;
+            spinsRemaining += 5;
 
             message =
-                "+5 Spins";
+                "➕ 5 Spins";
 
             break;
 
         case "SPIN_AGAIN":
 
             message =
-                "Spin Again";
+                "🎯 Spin Again";
 
             break;
 
@@ -630,7 +856,7 @@ function applyResult(result){
                 shield = false;
 
                 message =
-                    "Shield Blocked Damage";
+                    "🛡 Shield Blocked Damage";
 
             }
             else{
@@ -638,7 +864,7 @@ function applyResult(result){
                 lives--;
 
                 message =
-                    "Lost A Life";
+                    "❤ Lost Life";
 
             }
 
@@ -647,22 +873,25 @@ function applyResult(result){
     }
 
     if(
-        timer <= 0
+        spinsRemaining <= 0
     ){
 
         lives--;
 
-        timer =
-            maxTimer;
+        spinsRemaining =
+            maxSpins;
 
         message +=
-            " | Timer Penalty";
+
+            " | ⏳ Spin Limit Reached";
 
     }
 
-    document.getElementById(
-        "resultBox"
-    ).textContent =
+    document
+        .getElementById(
+            "resultBox"
+        )
+        .textContent =
         message;
 
     updateUI();
@@ -691,7 +920,14 @@ function applyResult(result){
 
 }
 
+/* =====================================================
+   PART 3
+   Stage Complete / Reset / Gallery / Victory
+===================================================== */
+
 function stageComplete(){
+
+    saveProgress();
 
     document
         .getElementById(
@@ -723,19 +959,25 @@ function stageComplete(){
 
 function continueAfterReveal(){
 
-    unlockedImages.push(
+    const stageImage =
 
         gameData.stages[
             currentStage
-        ].image
+        ].image;
 
+    unlockedImages.push(
+        stageImage
     );
 
     currentStage++;
 
+    saveProgress();
+
     if(
+
         currentStage >=
         gameData.stages.length
+
     ){
 
         showVictory();
@@ -747,6 +989,10 @@ function continueAfterReveal(){
     loadStage();
 
     renderGallery();
+
+    updateUI();
+
+    drawWheel();
 
     document
         .getElementById(
@@ -764,11 +1010,11 @@ function continueAfterReveal(){
             "hidden"
         );
 
-    updateUI();
-
 }
 
 function stageReset(){
+
+    saveProgress();
 
     document
         .getElementById(
@@ -792,6 +1038,10 @@ function continueAfterReset(){
 
     loadStage();
 
+    updateUI();
+
+    drawWheel();
+
     document
         .getElementById(
             "resetScreen"
@@ -808,18 +1058,18 @@ function continueAfterReset(){
             "hidden"
         );
 
-    updateUI();
-
 }
 
 function renderGallery(){
 
-    const card =
+    const galleryCard =
+
         document.getElementById(
             "galleryCard"
         );
 
     const gallery =
+
         document.getElementById(
             "gallery"
         );
@@ -830,33 +1080,39 @@ function renderGallery(){
         unlockedImages.length === 0
     ){
 
-        card.classList.add(
-            "hidden"
-        );
+        galleryCard
+            .classList.add(
+                "hidden"
+            );
 
         return;
 
     }
 
-    card.classList.remove(
-        "hidden"
-    );
+    galleryCard
+        .classList.remove(
+            "hidden"
+        );
 
     unlockedImages.forEach(
-        src=>{
+
+        imageSrc=>{
 
             const img =
+
                 document.createElement(
                     "img"
                 );
 
-            img.src = src;
+            img.src =
+                imageSrc;
 
             gallery.appendChild(
                 img
             );
 
         }
+
     );
 
 }
@@ -869,6 +1125,14 @@ function showVictory(){
 
     document
         .getElementById(
+            "gameScreen"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+    document
+        .getElementById(
             "stageCompleteScreen"
         )
         .classList.add(
@@ -877,7 +1141,7 @@ function showVictory(){
 
     document
         .getElementById(
-            "gameScreen"
+            "resetScreen"
         )
         .classList.add(
             "hidden"
@@ -891,21 +1155,28 @@ function showVictory(){
             "hidden"
         );
 
-    document
-        .getElementById(
-            "bonusImage"
-        )
-        .src =
-        gameData.bonus;
+    if(
+        gameData.bonus
+    ){
+
+        document
+            .getElementById(
+                "bonusImage"
+            )
+            .src =
+            gameData.bonus;
+
+    }
 
     const gallery =
+
         document.getElementById(
             "finalGallery"
         );
 
     gallery.innerHTML = "";
 
-    const images = [
+    const allImages = [
 
         gameData.cover,
 
@@ -913,23 +1184,51 @@ function showVictory(){
 
     ];
 
-    images.forEach(
+    if(
+        gameData.bonus
+    ){
+
+        allImages.push(
+            gameData.bonus
+        );
+
+    }
+
+    allImages.forEach(
+
         src=>{
 
             const img =
+
                 document.createElement(
                     "img"
                 );
 
-            img.src = src;
+            img.src =
+                src;
 
             gallery.appendChild(
                 img
             );
 
         }
+
     );
 
 }
 
-saveProgress();
+window.addEventListener(
+
+    "beforeunload",
+
+    ()=>{
+
+        saveProgress();
+
+    }
+
+);
+
+/* =====================================================
+   END OF FILE
+===================================================== */
