@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,534 +14,382 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
+    font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-    background:#000;
-    color:#fff;
-    font-family:Arial,Helvetica,sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
+    background:#111;
+    color:white;
+    padding:20px;
 }
-
-/* BACKGROUND */
-
-#backgroundImage{
-    position:fixed;
-    inset:0;
-
-    background-size:cover;
-    background-position:center;
-
-    filter:blur(40px);
-
-    transform:scale(1.15);
-
-    opacity:.45;
-
-    z-index:-2;
-}
-
-#overlay{
-    position:fixed;
-    inset:0;
-
-    background:rgba(0,0,0,.65);
-
-    z-index:-1;
-}
-
-/* LAYOUT */
 
 .container{
     max-width:900px;
     margin:auto;
-    padding:20px;
 }
 
-.panel{
-    background:rgba(20,20,20,.92);
-
-    backdrop-filter:blur(10px);
-
-    border-radius:16px;
-
-    padding:20px;
-
-    border:1px solid
-        rgba(255,255,255,.08);
+.hidden{
+    display:none;
 }
 
-/* HEADER */
-
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-#difficultyBadge{
-    background:#222;
-    border-radius:20px;
-    padding:8px 14px;
-}
-
-h1{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-/* TARGET IMAGE */
-
-#targetFrame{
-    width:100%;
-    height:220px;
-
+.card{
+    background:#1c1c1c;
     border-radius:12px;
-
-    overflow:hidden;
-
+    padding:20px;
     margin-bottom:20px;
-
-    border:2px solid
-        rgba(255,255,255,.1);
-
-    background:#000;
 }
 
-#targetImage{
+.center{
+    text-align:center;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.primary{
+    background:#00b894;
+    color:white;
+}
+
+.primary:hover{
+    background:#00a383;
+}
+
+img{
     width:100%;
-    height:100%;
-
-    object-fit:cover;
-
-    filter:blur(40px);
-
-    transition:
-        filter .4s ease;
+    border-radius:10px;
 }
 
-/* ALARMS */
+.coverImage{
+    max-height:600px;
+    object-fit:cover;
+}
 
-#alarmContainer{
+.previewImage{
+    height:350px;
+    object-fit:cover;
+    filter:blur(20px);
+}
+
+.revealImage{
+    max-height:700px;
+    object-fit:contain;
+}
+
+.stageTitle{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.difficulty{
+    text-align:center;
+    color:#999;
+    margin-bottom:20px;
+    text-transform:uppercase;
+}
+
+.passwordDisplay{
+    text-align:center;
+    font-size:42px;
+    font-weight:bold;
+    letter-spacing:8px;
+    margin-top:20px;
+    word-break:break-word;
+}
+
+.alarmContainer{
     display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:10px;
+    justify-content:center;
+    gap:12px;
+    margin-top:20px;
 }
 
 .alarm{
-    width:18px;
-    height:18px;
-    border-radius:50%;
-
-    background:#ff3b30;
-
-    box-shadow:
-        0 0 10px
-        rgba(255,59,48,.6);
-}
-
-/* PASSWORD */
-
-#passwordDisplay{
-    margin-top:15px;
-
-    text-align:center;
-
-    font-size:34px;
-
-    font-weight:bold;
-
-    letter-spacing:10px;
-
-    word-break:break-all;
-}
-
-/* CODE */
-
-#codeDisplay{
-    margin-top:20px;
-
-    background:#000;
-
-    border-radius:12px;
-
-    padding:15px;
-
-    text-align:center;
-
-    font-size:36px;
-
-    letter-spacing:10px;
-
-    min-height:75px;
-}
-
-/* NUMPAD */
-
-.numpad{
-    display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    gap:10px;
-
-    margin-top:20px;
-}
-
-.numpad button{
-    height:65px;
-
-    border:none;
-
-    border-radius:10px;
-
-    background:#222;
-
-    color:white;
-
-    font-size:24px;
-
-    cursor:pointer;
-}
-
-.numpad button:hover{
-    background:#333;
-}
-
-/* ACTIONS */
-
-.actions{
-    display:flex;
-    gap:10px;
-    margin-top:15px;
-}
-
-.actions button{
-    flex:1;
-
-    height:60px;
-
-    border:none;
-
-    border-radius:10px;
-
-    color:white;
-
-    font-size:18px;
-
-    cursor:pointer;
-}
-
-#hackBtn{
-    background:#00b894;
-}
-
-#clearBtn{
-    background:#636e72;
-}
-
-/* HINTS */
-
-#hintLights{
-    display:flex;
-
-    justify-content:center;
-
-    gap:12px;
-
-    margin-top:20px;
-
-    min-height:22px;
-}
-
-.hint{
     width:22px;
     height:22px;
     border-radius:50%;
+    background:#ff3b3b;
+    box-shadow:
+        0 0 8px #ff3b3b,
+        0 0 16px #ff3b3b;
 }
 
-.green{
-    background:#00b894;
-}
-
-.yellow{
-    background:#f1c40f;
-}
-
-.grey{
-    background:#636e72;
-}
-
-/* RESULT */
-
-#wheelResult{
+.codeDisplay{
+    margin-top:25px;
     text-align:center;
-
-    font-size:24px;
-
+    font-size:40px;
     font-weight:bold;
+    letter-spacing:12px;
+    min-height:50px;
+}
 
+.keypad{
     margin-top:20px;
+    display:grid;
+    grid-template-columns:
+        repeat(3,1fr);
+    gap:10px;
+}
 
+.keypad button{
+    padding:18px;
+    font-size:24px;
+}
+
+.numberBtn{
+    background:#333;
+    color:white;
+}
+
+.numberBtn:hover{
+    background:#444;
+}
+
+.clearBtn{
+    background:#555;
+    color:white;
+}
+
+.hackBtn{
+    background:#00b894;
+    color:white;
+}
+
+.resultBox{
+    margin-top:20px;
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
     min-height:40px;
 }
 
-/* LOG */
+.history{
+    margin-top:25px;
+}
 
-#log{
-    margin-top:20px;
+.history h3{
+    margin-bottom:10px;
+}
 
-    background:#111;
-
-    border-radius:12px;
-
+.historyList{
+    background:#222;
+    border-radius:10px;
     padding:15px;
-
-    height:180px;
-
+    max-height:220px;
     overflow-y:auto;
 }
 
-.logEntry{
+.historyEntry{
+    display:flex;
+    justify-content:space-between;
     margin-bottom:8px;
+    font-family:monospace;
+    font-size:18px;
 }
 
-/* MODAL */
-
-#modal{
-    position:fixed;
-    inset:0;
-
-    display:none;
-
-    align-items:center;
-    justify-content:center;
-
-    background:
-        rgba(0,0,0,.85);
-
-    z-index:1000;
-}
-
-.modalContent{
-    width:100%;
-    max-width:500px;
-
-    background:#111;
-
-    border-radius:16px;
-
-    padding:30px;
-
-    text-align:center;
-}
-
-.modalContent h2{
-    margin-bottom:15px;
-}
-
-.modalContent button{
-    width:100%;
-
-    height:50px;
-
-    border:none;
-
-    border-radius:10px;
-
-    background:#00b894;
-
-    color:white;
-
-    cursor:pointer;
-
+.gallery{
+    display:grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(140px,1fr)
+        );
+    gap:10px;
     margin-top:20px;
 }
 
-/* HACKING OVERLAY */
-
-#hackOverlay{
-    position:fixed;
-    inset:0;
-
-    display:none;
-
-    align-items:center;
-    justify-content:center;
-
-    background:
-        rgba(0,0,0,.9);
-
-    z-index:2000;
+.gallery img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
 }
 
-.hackBox{
-    width:90%;
-    max-width:500px;
+.green{
+    color:#2ecc71;
 }
 
-#hackStatus{
-    text-align:center;
-
-    font-size:28px;
-
-    letter-spacing:4px;
-
-    margin-bottom:20px;
+.yellow{
+    color:#f1c40f;
 }
 
-#progressOuter{
-    height:24px;
-
-    background:#222;
-
-    border-radius:12px;
-
-    overflow:hidden;
-}
-
-#progressInner{
-    width:0%;
-
-    height:100%;
-
-    background:#00b894;
+.grey{
+    color:#777;
 }
 
 </style>
+
 </head>
 <body>
 
-<div id="backgroundImage"></div>
-<div id="overlay"></div>
-
 <div class="container">
 
-    <div class="panel">
+<!-- LOADING -->
 
-        <div class="header">
+<div
+    id="loadingScreen"
+    class="card center">
 
-            <div id="stageLabel">
-                Stage 1 / 5
-            </div>
-
-            <div id="difficultyBadge">
-                Easy
-            </div>
-
-        </div>
-
-        <h1>EXPOSURE VAULT</h1>
-
-        <div id="targetFrame">
-
-            <img
-                id="targetImage"
-                src=""
-                alt="Target">
-
-        </div>
-
-        <h3>Security Alarms</h3>
-
-        <div id="alarmContainer"></div>
-
-        <h3
-            style="margin-top:20px;">
-            Password
-        </h3>
-
-        <div id="passwordDisplay">
-            ********
-        </div>
-
-        <div id="codeDisplay">
-            ----
-        </div>
-
-        <div class="numpad">
-
-            <button onclick="addDigit('1')">1</button>
-            <button onclick="addDigit('2')">2</button>
-            <button onclick="addDigit('3')">3</button>
-
-            <button onclick="addDigit('4')">4</button>
-            <button onclick="addDigit('5')">5</button>
-            <button onclick="addDigit('6')">6</button>
-
-            <button onclick="addDigit('7')">7</button>
-            <button onclick="addDigit('8')">8</button>
-            <button onclick="addDigit('9')">9</button>
-
-            <button onclick="clearCode()">⌫</button>
-            <button onclick="addDigit('0')">0</button>
-            <button onclick="resetCode()">C</button>
-
-        </div>
-
-        <div class="actions">
-
-            <button
-                id="hackBtn"
-                onclick="attemptHack()">
-                HACK
-            </button>
-
-            <button
-                id="clearBtn"
-                onclick="resetCode()">
-                CLEAR
-            </button>
-
-        </div>
-
-        <div id="hintLights"></div>
-
-        <div id="wheelResult">
-            READY
-        </div>
-
-        <div id="log"></div>
-
-    </div>
+```
+Loading Vault...
+```
 
 </div>
 
-<!-- MODAL -->
+<!-- COVER -->
 
-<div id="modal">
+<div
+    id="coverScreen"
+    class="card center hidden">
 
-    <div class="modalContent">
+```
+<h1>Exposure Vault</h1>
 
-        <h2 id="modalTitle"></h2>
+<br>
 
-        <p id="modalMessage"></p>
+<img
+    id="coverImage"
+    class="coverImage">
 
-        <button onclick="closeModal()">
-            Continue
+<br><br>
+
+<button
+    class="primary"
+    style="width:100%;padding:18px;font-size:22px;"
+    onclick="startGame()">
+
+    Begin Exposure
+
+</button>
+```
+
+</div>
+
+<!-- GAME -->
+
+<div
+    id="gameScreen"
+    class="hidden">
+
+```
+<div class="card">
+
+    <h2
+        id="stageTitle"
+        class="stageTitle">
+
+        Stage 1 / 5
+
+    </h2>
+
+    <div
+        id="difficultyDisplay"
+        class="difficulty">
+
+        EASY
+
+    </div>
+
+    <img
+        id="vaultImage"
+        class="previewImage">
+
+    <div
+        id="passwordDisplay"
+        class="passwordDisplay">
+
+        ********
+
+    </div>
+
+    <div
+        id="alarmContainer"
+        class="alarmContainer">
+
+    </div>
+
+    <div
+        id="codeDisplay"
+        class="codeDisplay">
+
+        ----
+
+    </div>
+
+    <div class="keypad">
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('1')">1</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('2')">2</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('3')">3</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('4')">4</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('5')">5</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('6')">6</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('7')">7</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('8')">8</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('9')">9</button>
+
+        <button
+            class="clearBtn"
+            onclick="clearCode()">C</button>
+
+        <button
+            class="numberBtn"
+            onclick="pressDigit('0')">0</button>
+
+        <button
+            class="hackBtn"
+            onclick="hack()">
+
+            HACK
+
         </button>
 
     </div>
 
-</div>
+    <div
+        id="resultBox"
+        class="resultBox">
 
-<!-- HACKING SCREEN -->
+    </div>
 
-<div id="hackOverlay">
+    <div class="history">
 
-    <div class="hackBox">
+        <h3>
+            Access Log
+        </h3>
 
-        <div id="hackStatus">
-            HACKING...
-        </div>
-
-        <div id="progressOuter">
-
-            <div id="progressInner"></div>
+        <div
+            id="historyList"
+            class="historyList">
 
         </div>
 
@@ -548,8 +397,140 @@ h1{
 
 </div>
 
+<!-- GALLERY -->
+
+<div
+    id="galleryCard"
+    class="card hidden">
+
+    <h2>
+        Exposed Images
+    </h2>
+
+    <div
+        id="gallery"
+        class="gallery">
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- STAGE COMPLETE -->
+
+<div
+    id="stageCompleteScreen"
+    class="card center hidden">
+
+```
+<h1>
+    IMAGE EXPOSED
+</h1>
+
+<br>
+
+<img
+    id="revealedImage"
+    class="revealImage">
+
+<br><br>
+
+<button
+    class="primary"
+    style="width:100%;padding:18px;font-size:22px;"
+    onclick="continueAfterReveal()">
+
+    Continue
+
+</button>
+```
+
+</div>
+
+<!-- LOCKDOWN -->
+
+<div
+    id="resetScreen"
+    class="card center hidden">
+
+```
+<h1>
+    SECURITY LOCKDOWN
+</h1>
+
+<br>
+
+<p>
+    The vault has reset.
+</p>
+
+<br>
+
+<p>
+    Password hidden again.
+</p>
+
+<br>
+
+<p>
+    New access code generated.
+</p>
+
+<br><br>
+
+<button
+    class="primary"
+    style="width:100%;padding:18px;font-size:22px;"
+    onclick="continueAfterReset()">
+
+    Retry Stage
+
+</button>
+```
+
+</div>
+
+<!-- VICTORY -->
+
+<div
+    id="victoryScreen"
+    class="card center hidden">
+
+```
+<h1>
+    BONUS VAULT UNLOCKED
+</h1>
+
+<br>
+
+<img
+    id="bonusImage"
+    class="revealImage">
+
+<br><br>
+
+<h2>
+    Complete Collection
+</h2>
+
+<br>
+
+<div
+    id="finalGallery"
+    class="gallery">
+
+</div>
+```
+
+</div>
+
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-<script src="play.js"></script>
+
+<script src="js/play.js"></script>
 
 </body>
 </html>
