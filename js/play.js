@@ -1,3 +1,8 @@
+/* =====================================================
+   EXPOSURE VAULT
+   PART 1
+   STATE / LOAD / SAVE / STAGE SETUP / UI
+===================================================== */
 
 let gameData = null;
 
@@ -5,12 +10,10 @@ const STORAGE_KEY =
     "exposure-vault-save-v1";
 
 /* ==========================================
-   STAGE EVENT TABLES
+   EVENT TABLES
 ========================================== */
 
 const eventPools = [
-
-    // Stage 1
 
     [
         ...Array(12).fill("HACK"),
@@ -21,8 +24,6 @@ const eventPools = [
         ...Array(1).fill("CAUTION")
     ],
 
-    // Stage 2
-
     [
         ...Array(10).fill("HACK"),
         ...Array(3).fill("DECRYPT"),
@@ -31,8 +32,6 @@ const eventPools = [
         ...Array(3).fill("ALARM"),
         ...Array(2).fill("CAUTION")
     ],
-
-    // Stage 3
 
     [
         ...Array(8).fill("HACK"),
@@ -43,8 +42,6 @@ const eventPools = [
         ...Array(3).fill("CAUTION")
     ],
 
-    // Stage 4
-
     [
         ...Array(7).fill("HACK"),
         ...Array(3).fill("DECRYPT"),
@@ -53,8 +50,6 @@ const eventPools = [
         ...Array(7).fill("ALARM"),
         ...Array(4).fill("CAUTION")
     ],
-
-    // Stage 5
 
     [
         ...Array(6).fill("HACK"),
@@ -80,6 +75,8 @@ let alarms = 0;
 let maxAlarms = 0;
 
 let secretCode = "";
+
+let currentInput = "";
 
 let unlockedImages = [];
 
@@ -116,8 +113,7 @@ function init(){
     try{
 
         const json =
-            LZString
-            .decompressFromEncodedURIComponent(
+            LZString.decompressFromEncodedURIComponent(
                 hash
             );
 
@@ -321,9 +317,8 @@ function loadStage(){
         ];
 
     password =
-        (
-            stage.password || ""
-        ).toUpperCase();
+        (stage.password || "")
+        .toUpperCase();
 
     revealedPassword =
         buildHiddenPassword(
@@ -341,6 +336,8 @@ function loadStage(){
 
     generateNewCode();
 
+    currentInput = "";
+
     saveProgress();
 
 }
@@ -355,19 +352,16 @@ function calculateAlarms(
     ){
 
         case "hard":
-
             return Math.ceil(
                 length * 0.5
             );
 
         case "medium":
-
             return Math.ceil(
                 length * 0.75
             );
 
         default:
-
             return length;
 
     }
@@ -412,12 +406,11 @@ function generateNewCode(){
 
     }
 
-    }
+}
 
-/* =====================================================
-   PART 2
-   UI / KEYPAD / MASTERMIND / HACK SYSTEM
-===================================================== */
+/* ==========================================
+   UI
+========================================== */
 
 function updateUI(){
 
@@ -461,6 +454,17 @@ function updateUI(){
         .textContent =
         revealedPassword;
 
+    document
+        .getElementById(
+            "codeDisplay"
+        )
+        .textContent =
+
+        currentInput.padEnd(
+            4,
+            "-"
+        );
+
     renderAlarms();
 
 }
@@ -469,7 +473,7 @@ function renderAlarms(){
 
     const container =
         document.getElementById(
-            "alarmsDisplay"
+            "alarmContainer"
         );
 
     container.innerHTML = "";
@@ -486,7 +490,7 @@ function renderAlarms(){
             );
 
         dot.className =
-            "alarmDot";
+            "alarm";
 
         container.appendChild(
             dot
@@ -500,49 +504,30 @@ function renderAlarms(){
    KEYPAD
 ========================================== */
 
-function addDigit(
+function pressDigit(
     digit
 ){
 
-    const input =
-        document.getElementById(
-            "codeInput"
-        );
+    if(processing){
+        return;
+    }
 
     if(
-        input.value.length >= 4
+        currentInput.length >= 4
     ){
         return;
     }
 
-    input.value += digit;
+    currentInput += digit;
+
+    updateUI();
 
 }
 
-function clearCode(){
-
-    document
-        .getElementById(
-            "codeInput"
-        )
-        .value = "";
-
-}
-
-function deleteDigit(){
-
-    const input =
-        document.getElementById(
-            "codeInput"
-        );
-
-    input.value =
-        input.value.slice(
-            0,
-            -1
-        );
-
-}
+/* =====================================================
+   PART 2
+   HACK SYSTEM / PROGRESS BAR / MASTERMIND
+===================================================== */
 
 /* ==========================================
    HACK BUTTON
@@ -554,16 +539,8 @@ function hack(){
         return;
     }
 
-    const input =
-        document.getElementById(
-            "codeInput"
-        );
-
-    const guess =
-        input.value;
-
     if(
-        guess.length !== 4
+        currentInput.length !== 4
     ){
 
         setResult(
@@ -576,17 +553,18 @@ function hack(){
 
     processing = true;
 
-    document
-        .getElementById(
+    const button =
+        document.getElementById(
             "hackButton"
-        )
-        .disabled = true;
+        );
+
+    if(button){
+        button.disabled = true;
+    }
 
     runProgressBar(
         ()=>{
-            processHack(
-                guess
-            );
+            processHack();
         }
     );
 
@@ -636,18 +614,17 @@ function runProgressBar(
 }
 
 /* ==========================================
-   MAIN HACK PROCESS
+   PROCESS HACK
 ========================================== */
 
-function processHack(
-    guess
-){
+function processHack(){
 
-    document
-        .getElementById(
-            "codeInput"
-        )
-        .value = "";
+    const guess =
+        currentInput;
+
+    currentInput = "";
+
+    updateUI();
 
     const hints =
         buildHints(
@@ -656,6 +633,11 @@ function processHack(
         );
 
     renderHints(
+        hints
+    );
+
+    addHistoryEntry(
+        guess,
         hints
     );
 
@@ -678,7 +660,7 @@ function processHack(
 }
 
 /* ==========================================
-   MASTERMIND
+   MASTERMIND LOGIC
 ========================================== */
 
 function buildHints(
@@ -688,18 +670,18 @@ function buildHints(
 
     const hints = [];
 
-    const codeArr =
-        code.split("");
-
     const guessArr =
         guess.split("");
 
-    const usedCode =
+    const codeArr =
+        code.split("");
+
+    const usedGuess =
         Array(4).fill(
             false
         );
 
-    const usedGuess =
+    const usedCode =
         Array(4).fill(
             false
         );
@@ -720,10 +702,10 @@ function buildHints(
             hints[i] =
                 "GREEN";
 
-            usedCode[i] =
+            usedGuess[i] =
                 true;
 
-            usedGuess[i] =
+            usedCode[i] =
                 true;
 
         }
@@ -764,10 +746,10 @@ function buildHints(
                 hints[i] =
                     "YELLOW";
 
-                usedCode[j] =
+                usedGuess[i] =
                     true;
 
-                usedGuess[i] =
+                usedCode[j] =
                     true;
 
                 break;
@@ -801,6 +783,10 @@ function buildHints(
 
 }
 
+/* ==========================================
+   HINT DISPLAY
+========================================== */
+
 function renderHints(
     hints
 ){
@@ -809,6 +795,10 @@ function renderHints(
         document.getElementById(
             "hintRow"
         );
+
+    if(!row){
+        return;
+    }
 
     row.innerHTML = "";
 
@@ -829,6 +819,67 @@ function renderHints(
             );
 
         }
+    );
+
+}
+
+/* ==========================================
+   ACCESS LOG
+========================================== */
+
+function addHistoryEntry(
+    guess,
+    hints
+){
+
+    const history =
+        document.getElementById(
+            "historyList"
+        );
+
+    if(!history){
+        return;
+    }
+
+    const entry =
+        document.createElement(
+            "div"
+        );
+
+    entry.className =
+        "historyEntry";
+
+    const hintHTML =
+        hints.map(
+            hint=>{
+
+                if(
+                    hint === "GREEN"
+                ){
+                    return
+                    "<span class='green'>●</span>";
+                }
+
+                if(
+                    hint === "YELLOW"
+                ){
+                    return
+                    "<span class='yellow'>●</span>";
+                }
+
+                return
+                "<span class='grey'>●</span>";
+
+            }
+        ).join("");
+
+    entry.innerHTML =
+
+        `<span>${guess}</span>
+         <span>${hintHTML}</span>`;
+
+    history.prepend(
+        entry
     );
 
 }
@@ -856,7 +907,7 @@ function codeCracked(){
 }
 
 /* ==========================================
-   EVENT SYSTEM
+   RANDOM EVENT ROLL
 ========================================== */
 
 function rollEvent(){
@@ -870,6 +921,7 @@ function rollEvent(){
         ];
 
     const result =
+
         pool[
             Math.floor(
                 Math.random()
@@ -886,8 +938,12 @@ function rollEvent(){
 
 /* =====================================================
    PART 3
-   EVENTS / LETTER REVEALS / STAGES / VICTORY
+   EVENTS / PASSWORD / STAGES / VICTORY
 ===================================================== */
+
+/* ==========================================
+   EVENTS
+========================================== */
 
 function resolveEvent(
     eventType
@@ -982,6 +1038,7 @@ function processCaution(){
         ];
 
     const nextResult =
+
         pool[
             Math.floor(
                 Math.random()
@@ -996,6 +1053,12 @@ function processCaution(){
     ){
 
         alarms -= 3;
+
+        if(
+            alarms < 0
+        ){
+            alarms = 0;
+        }
 
         setResult(
             "CAUTION FAILED • -3 ALARMS"
@@ -1124,7 +1187,8 @@ function setResult(
         box.style.opacity =
             "1";
 
-        processing = false;
+        processing =
+            false;
 
         const button =
             document.getElementById(
@@ -1295,6 +1359,24 @@ function continueAfterReset(){
 
     updateUI();
 
+    const history =
+        document.getElementById(
+            "historyList"
+        );
+
+    if(history){
+        history.innerHTML = "";
+    }
+
+    const hintRow =
+        document.getElementById(
+            "hintRow"
+        );
+
+    if(hintRow){
+        hintRow.innerHTML = "";
+    }
+
     document
         .getElementById(
             "resetScreen"
@@ -1420,17 +1502,14 @@ function showVictory(){
             "hidden"
         );
 
-    const bonusImage =
-        document.getElementById(
-            "bonusImage"
-        );
-
     if(
-        bonusImage &&
         gameData.bonus
     ){
 
-        bonusImage.src =
+        document
+            .getElementById(
+                "bonusImage"
+            ).src =
             gameData.bonus;
 
     }
@@ -1439,10 +1518,6 @@ function showVictory(){
         document.getElementById(
             "finalGallery"
         );
-
-    if(!gallery){
-        return;
-    }
 
     gallery.innerHTML = "";
 
@@ -1487,7 +1562,7 @@ function showVictory(){
 }
 
 /* ==========================================
-   AUTO SAVE
+   AUTOSAVE
 ========================================== */
 
 window.addEventListener(
@@ -1502,6 +1577,14 @@ window.addEventListener(
 
 );
 
-/* =====================================================
-   END OF FILE
-===================================================== */
+function clearCode(){
+
+    if(processing){
+        return;
+    }
+
+    currentInput = "";
+
+    updateUI();
+
+}
