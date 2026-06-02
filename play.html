@@ -43,13 +43,9 @@ body{
 }
 
 button{
-    width:100%;
-    padding:18px;
     border:none;
     border-radius:10px;
     cursor:pointer;
-    font-size:22px;
-    font-weight:bold;
 }
 
 .primary{
@@ -72,13 +68,25 @@ img{
     filter:blur(18px);
 }
 
+.stageTitle{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.difficulty{
+    text-align:center;
+    color:#999;
+    margin-bottom:20px;
+    text-transform:uppercase;
+}
+
 .passwordBox{
     text-align:center;
     font-size:42px;
-    letter-spacing:8px;
     font-weight:bold;
-    word-break:break-word;
+    letter-spacing:8px;
     margin-top:20px;
+    word-break:break-word;
 }
 
 .stats{
@@ -88,6 +96,7 @@ img{
             auto-fit,
             minmax(180px,1fr)
         );
+
     gap:15px;
     margin-top:20px;
 }
@@ -106,20 +115,153 @@ img{
 }
 
 .statValue{
-    font-size:26px;
+    font-size:28px;
     font-weight:bold;
 }
+
+#alarmsDisplay{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+}
+
+.alarm{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#ff2b2b;
+
+    box-shadow:
+        0 0 6px #ff2b2b,
+        0 0 12px #ff2b2b,
+        0 0 24px #ff2b2b;
+}
+
+/* ==========================
+   PROGRESS BAR
+========================== */
+
+.hackBar{
+    margin-top:20px;
+    height:14px;
+    background:#222;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+#hackProgress{
+    width:0%;
+    height:100%;
+    background:#00b894;
+}
+
+/* ==========================
+   RESULTS
+========================== */
 
 .resultBox{
     text-align:center;
+    margin-top:20px;
+    min-height:120px;
+    font-size:20px;
+    line-height:1.6;
+    white-space:pre-line;
+}
+
+/* ==========================
+   CODE INPUT
+========================== */
+
+.codeInput{
+    margin-top:25px;
+}
+
+#codeDisplay{
+
+    width:100%;
+    height:70px;
+
+    background:#000;
+    color:#00ff66;
+
+    border:2px solid #333;
+    border-radius:10px;
+
+    text-align:center;
+    font-size:38px;
+    font-weight:bold;
+    letter-spacing:12px;
+}
+
+.numpad{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:10px;
+
+    margin-top:15px;
+}
+
+.numBtn{
+
+    height:70px;
+
+    background:#333;
+    color:white;
+
     font-size:28px;
     font-weight:bold;
-    margin-top:20px;
-    min-height:40px;
+
+    border-radius:10px;
 }
+
+.numBtn:hover{
+    background:#444;
+}
+
+.actionRow{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 2fr;
+
+    gap:10px;
+
+    margin-top:10px;
+}
+
+.clearBtn{
+
+    height:70px;
+
+    background:#555;
+    color:white;
+
+    font-size:20px;
+}
+
+.hackBtn{
+
+    height:70px;
+
+    background:#00b894;
+    color:white;
+
+    font-size:24px;
+    font-weight:bold;
+}
+
+/* ==========================
+   GALLERY
+========================== */
 
 .gallery{
     display:grid;
+
     grid-template-columns:
         repeat(
             auto-fit,
@@ -127,6 +269,7 @@ img{
         );
 
     gap:10px;
+
     margin-top:20px;
 }
 
@@ -137,20 +280,8 @@ img{
 }
 
 .revealImage{
-    max-height:600px;
+    max-height:700px;
     object-fit:contain;
-}
-
-.stageTitle{
-    text-align:center;
-    margin-bottom:15px;
-}
-
-.difficulty{
-    text-align:center;
-    color:#aaa;
-    margin-bottom:15px;
-    text-transform:uppercase;
 }
 
 </style>
@@ -179,13 +310,13 @@ img{
 
     <br>
 
-    <img
-        id="coverImage">
+    <img id="coverImage">
 
     <br><br>
 
     <button
         class="primary"
+        style="width:100%;padding:18px;font-size:22px;"
         onclick="startGame()">
 
         Begin Hack
@@ -258,11 +389,15 @@ img{
                     id="alarmsDisplay"
                     class="statValue">
 
-                    ❤❤❤
-
                 </div>
 
             </div>
+
+        </div>
+
+        <div class="hackBar">
+
+            <div id="hackProgress"></div>
 
         </div>
 
@@ -272,14 +407,58 @@ img{
 
         </div>
 
-        <button
-            id="hackButton"
-            class="primary"
-            onclick="hack()">
+        <!-- CODE ENTRY -->
 
-            HACK
+        <div class="codeInput">
 
-        </button>
+            <input
+                id="codeDisplay"
+                type="text"
+                value=""
+                readonly>
+
+            <div class="numpad">
+
+                <button class="numBtn" onclick="addDigit('1')">1</button>
+                <button class="numBtn" onclick="addDigit('2')">2</button>
+                <button class="numBtn" onclick="addDigit('3')">3</button>
+
+                <button class="numBtn" onclick="addDigit('4')">4</button>
+                <button class="numBtn" onclick="addDigit('5')">5</button>
+                <button class="numBtn" onclick="addDigit('6')">6</button>
+
+                <button class="numBtn" onclick="addDigit('7')">7</button>
+                <button class="numBtn" onclick="addDigit('8')">8</button>
+                <button class="numBtn" onclick="addDigit('9')">9</button>
+
+                <button class="numBtn" onclick="backspaceDigit()">⌫</button>
+                <button class="numBtn" onclick="addDigit('0')">0</button>
+                <button class="numBtn" onclick="clearCode()">C</button>
+
+            </div>
+
+            <div class="actionRow">
+
+                <button
+                    class="clearBtn"
+                    onclick="clearCode()">
+
+                    CLEAR
+
+                </button>
+
+                <button
+                    id="hackButton"
+                    class="hackBtn"
+                    onclick="hack()">
+
+                    HACK
+
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -323,6 +502,7 @@ img{
 
     <button
         class="primary"
+        style="width:100%;padding:18px;font-size:22px;"
         onclick="continueAfterReveal()">
 
         Continue
@@ -357,6 +537,7 @@ img{
 
     <button
         class="primary"
+        style="width:100%;padding:18px;font-size:22px;"
         onclick="continueAfterReset()">
 
         Try Again
@@ -406,9 +587,7 @@ img{
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-
 <script src="js/play.js"></script>
 
 </body>
 </html>
- 
