@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vault Creator</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    background:#111;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+    padding:20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.card{
+    background:#1c1c1c;
+    border-radius:12px;
+    padding:20px;
+}
+
+h1,h2{
+    margin-bottom:15px;
+}
+
+label{
+    display:block;
+    margin-top:10px;
+    margin-bottom:5px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.primaryBtn{
+    width:100%;
+    padding:15px;
+    background:#00b894;
+    color:white;
+    font-size:18px;
+}
+
+.primaryBtn:hover{
+    background:#00a383;
+}
+
+.difficultyGroup{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.diffBtn{
+    flex:1;
+    padding:12px;
+    background:#333;
+    color:white;
+    font-size:16px;
+}
+
+.diffBtn.active{
+    background:#00b894;
+}
+
+textarea{
+    width:100%;
+    height:140px;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    resize:none;
+    margin-top:10px;
+}
+
+.copyBtn{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    background:#444;
+    color:white;
+}
+
+.copyBtn:hover{
+    background:#555;
+}
+
+.stageBlock{
+    border-top:1px solid #333;
+    padding-top:20px;
+    margin-top:20px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h1>Vault Creator</h1>
+
+<label>Cover Image URL</label>
+<input id="coverImage">
+
+<div id="stages"></div>
+
+<h2>Final Bonus Image URL</h2>
+
+<input id="bonusImage">
+
+<br>
+
+<button
+    class="primaryBtn"
+    onclick="generateLink()">
+
+    Generate Vault Link
+
+</button>
+
+<div id="output"></div>
+
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+
+<script>
+
+const stagesContainer =
+    document.getElementById(
+        "stages"
+    );
+
+for(let i=1;i<=5;i++){
+
+    stagesContainer.innerHTML += `
+
+    <div class="stageBlock">
+
+        <h2>Stage ${i}</h2>
+
+        <label>Image URL</label>
+
+        <input
+            id="stage${i}Image">
+
+        <label>Difficulty</label>
+
+        <div
+            class="difficultyGroup">
+
+            <button
+                type="button"
+                class="diffBtn active"
+                data-stage="${i}"
+                data-difficulty="easy">
+
+                Easy
+
+            </button>
+
+            <button
+                type="button"
+                class="diffBtn"
+                data-stage="${i}"
+                data-difficulty="medium">
+
+                Medium
+
+            </button>
+
+            <button
+                type="button"
+                class="diffBtn"
+                data-stage="${i}"
+                data-difficulty="hard">
+
+                Hard
+
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+document.addEventListener(
+    "click",
+    e=>{
+
+        if(
+            !e.target.classList.contains(
+                "diffBtn"
+            )
+        ){
+            return;
+        }
+
+        const stage =
+            e.target.dataset.stage;
+
+        document
+            .querySelectorAll(
+                `.diffBtn[data-stage="${stage}"]`
+            )
+            .forEach(
+                btn=>
+                btn.classList.remove(
+                    "active"
+                )
+            );
+
+        e.target.classList.add(
+            "active"
+        );
+
+    }
+);
+
+function generateLink(){
+
+    const stages = [];
+
+    for(let i=1;i<=5;i++){
+
+        const image =
+            document.getElementById(
+                `stage${i}Image`
+            ).value;
+
+        const difficulty =
+            document
+                .querySelector(
+                    `.diffBtn.active[data-stage="${i}"]`
+                )
+                .dataset
+                .difficulty;
+
+        stages.push({
+
+            image,
+            difficulty
+
+        });
+
+    }
+
+    const data = {
+
+        cover:
+            document.getElementById(
+                "coverImage"
+            ).value,
+
+        stages,
+
+        bonus:
+            document.getElementById(
+                "bonusImage"
+            ).value
+
+    };
+
+    const compressed =
+        LZString.compressToEncodedURIComponent(
+            JSON.stringify(data)
+        );
+
+    const basePath =
+        location.pathname
+            .replace(
+                "index.html",
+                ""
+            )
+            .replace(
+                /\/$/,
+                ""
+            );
+
+    const url =
+
+        location.origin +
+
+        basePath +
+
+        "/play.html#" +
+
+        compressed;
+
+    document.getElementById(
+        "output"
+    ).innerHTML =
+
+    `
+    <h2>Share Link</h2>
+
+    <textarea id="generatedLink">${url}</textarea>
+
+    <button
+        class="copyBtn"
+        onclick="copyLink()">
+
+        Copy Link
+
+    </button>
+    `;
+
+}
+
+function copyLink(){
+
+    const text =
+        document.getElementById(
+            "generatedLink"
+        ).value;
+
+    navigator.clipboard.writeText(
+        text
+    );
+
+    alert(
+        "Link copied!"
+    );
+
+}
+
+</script>
+
+</body>
+</html>
