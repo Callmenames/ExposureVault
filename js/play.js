@@ -605,68 +605,6 @@ function drawWheel(){
 
 {
 
-    const angle =
-
-        (
-            start +
-            end
-        ) / 2;
-
-    const x =
-
-        centerX +
-
-        Math.cos(
-            angle
-        ) *
-
-        (radius * 0.68);
-
-    const y =
-
-        centerY +
-
-        Math.sin(
-            angle
-        ) *
-
-        (radius * 0.68);
-
-    ctx.save();
-
-    ctx.translate(
-        x,
-        y
-    );
-
-    ctx.rotate(
-        angle +
-        Math.PI / 2
-    );
-
-    ctx.fillStyle =
-        "#000";
-
-    ctx.font =
-        "bold 11px Arial";
-
-    ctx.textAlign =
-        "center";
-
-    ctx.fillText(
-
-        wheelLabels[
-            segment
-        ],
-
-        0,
-
-        0
-
-    );
-
-    ctx.restore();
-
 }
 
 function spinWheel(){
@@ -711,34 +649,35 @@ function spinWheel(){
         /
         currentWheelLayout.length;
 
-      const segmentCenter =
-      
-          (
-              resultIndex
-              *
-              segmentSize
-          )
-          +
-          (
-              segmentSize
-              / 2
-          );
-      
-      const targetRotation =
-      
-          270
-          -
-          segmentCenter;
+    const segmentCenter =
 
-    currentRotation +=
+    (
+        resultIndex
+        *
+        segmentSize
+    )
+    +
+    (
+        segmentSize / 2
+    );
 
-        1440 +
+const finalRotation =
 
-        targetRotation;
+    270 -
+    segmentCenter;
 
-    wheel.style.transform =
+currentRotation =
 
-        `rotate(${currentRotation}deg)`;
+    finalRotation +
+
+    (
+        Math.floor(
+            currentRotation / 360
+        ) + 4
+    ) * 360;
+   
+wheel.style.transform =
+    `rotate(${currentRotation}deg)`;
 
     setTimeout(
 
