@@ -1,9 +1,25 @@
-const vaultData =
-    JSON.parse(
+let vaultData;
+
+try{
+
+    vaultData = JSON.parse(
         LZString.decompressFromEncodedURIComponent(
             location.hash.substring(1)
         )
     );
+
+}catch(error){
+
+    console.error(
+        "Invalid vault data",
+        error
+    );
+
+}
+
+console.log(
+    "script loaded"
+);
 
 let currentStageIndex = 0;
 
