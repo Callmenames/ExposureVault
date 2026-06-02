@@ -1,506 +1,152 @@
-/* =====================================================
-   VAULT CRACKER
-   PART 1
-   CORE STATE / SAVE SYSTEM / STAGES
-===================================================== */
+const vaultData =
+    JSON.parse(
+        LZString.decompressFromEncodedURIComponent(
+            location.hash.substring(1)
+        )
+    );
 
-let gameData = null;
-
-const STORAGE_KEY =
-    "vault-cracker-save-v3";
-
-/* =====================================================
-   CREATOR DIFFICULTIES
-===================================================== */
-
-const difficulties = {
-
-    easy:{
-        alarms:5,
-        attempts:10
-    },
-
-    medium:{
-        alarms:3,
-        attempts:8
-    },
-
-    hard:{
-        alarms:2,
-        attempts:6
-    }
-
-};
-
-/* =====================================================
-   STAGE CURVE
-===================================================== */
-
-const outcomePools = [
-
-    [
-        ...Array(12).fill("HACKED"),
-        ...Array(5).fill("TRY_AGAIN"),
-        ...Array(2).fill("FIREWALL"),
-        ...Array(1).fill("ALARM"),
-        ...Array(2).fill("DECRYPTING")
-    ],
-
-    [
-        ...Array(10).fill("HACKED"),
-        ...Array(5).fill("TRY_AGAIN"),
-        ...Array(2).fill("FIREWALL"),
-        ...Array(3).fill("ALARM"),
-        ...Array(2).fill("DECRYPTING")
-    ],
-
-    [
-        ...Array(8).fill("HACKED"),
-        ...Array(5).fill("TRY_AGAIN"),
-        ...Array(1).fill("FIREWALL"),
-        ...Array(5).fill("ALARM"),
-        ...Array(2).fill("DECRYPTING")
-    ],
-
-    [
-        ...Array(7).fill("HACKED"),
-        ...Array(4).fill("TRY_AGAIN"),
-        ...Array(1).fill("FIREWALL"),
-        ...Array(7).fill("ALARM"),
-        ...Array(2).fill("DECRYPTING")
-    ],
-
-    [
-        ...Array(6).fill("HACKED"),
-        ...Array(3).fill("TRY_AGAIN"),
-        ...Array(1).fill("FIREWALL"),
-        ...Array(9).fill("ALARM"),
-        ...Array(2).fill("DECRYPTING")
-    ]
-
-];
-
-/* =====================================================
-   GAME STATE
-===================================================== */
-
-let currentStage = 0;
-
-let password = "";
-let revealedPassword = "";
-
-let maxAlarms = 0;
-let alarms = 0;
-
-let maxAttempts = 0;
-let attempts = 0;
-
-let unlockedImages = [];
+let currentStageIndex = 0;
 
 let currentCode = "";
 
-let bonusDigit = 0;
-let trapDigit = 0;
+let secretCode = "";
 
-let processingHack = false;
+let alarms = 0;
 
-/* =====================================================
-   INIT
-===================================================== */
+let maxAlarms = 0;
 
-document.addEventListener(
-    "DOMContentLoaded",
-    init
-);
+let revealedLetters = [];
 
-function init(){
+let currentStage = null;
 
-    const hash =
-        location.hash.replace(
-            "#",
-            ""
+const hackMessages = [
+    "BYPASSING FIREWALL...",
+    "SCANNING NODE...",
+    "INJECTING PAYLOAD...",
+    "ACCESSING VAULT..."
+];
+
+function calculateAlarms(
+    password,
+    difficulty
+){
+
+    const length =
+        password.length;
+
+    if(difficulty === "easy"){
+
+        return length;
+
+    }
+
+    if(difficulty === "medium"){
+
+        return Math.ceil(
+            length * 0.75
         );
 
-    if(!hash){
-
-        document.getElementById(
-            "loadingScreen"
-        ).innerHTML =
-        "<h2>No vault data found.</h2>";
-
-        return;
-
     }
 
-    try{
-
-        const json =
-            LZString
-            .decompressFromEncodedURIComponent(
-                hash
-            );
-
-        gameData =
-            JSON.parse(
-                json
-            );
-
-        loadProgress();
-
-    }
-    catch(err){
-
-        console.error(err);
-
-        document.getElementById(
-            "loadingScreen"
-        ).innerHTML =
-        "<h2>Invalid vault link.</h2>";
-
-    }
-
-}
-
-/* =====================================================
-   SAVE
-===================================================== */
-
-function saveProgress(){
-
-    localStorage.setItem(
-
-        STORAGE_KEY,
-
-        JSON.stringify({
-
-            hash:
-                location.hash,
-
-            currentStage,
-
-            password,
-
-            revealedPassword,
-
-            maxAlarms,
-
-            alarms,
-
-            maxAttempts,
-
-            attempts,
-
-            unlockedImages,
-
-            bonusDigit,
-
-            trapDigit
-
-        })
-
+    return Math.ceil(
+        length * 0.5
     );
 
 }
 
-function loadProgress(){
+function generateSecretCode(){
 
-    const save =
-        localStorage.getItem(
-            STORAGE_KEY
-        );
-
-    if(save){
-
-        try{
-
-            const data =
-                JSON.parse(save);
-
-            if(
-                data.hash ===
-                location.hash
-            ){
-
-                currentStage =
-                    data.currentStage || 0;
-
-                password =
-                    data.password || "";
-
-                revealedPassword =
-                    data.revealedPassword || "";
-
-                maxAlarms =
-                    data.maxAlarms || 0;
-
-                alarms =
-                    data.alarms || 0;
-
-                maxAttempts =
-                    data.maxAttempts || 0;
-
-                attempts =
-                    data.attempts || 0;
-
-                unlockedImages =
-                    data.unlockedImages || [];
-
-                bonusDigit =
-                    data.bonusDigit ?? 0;
-
-                trapDigit =
-                    data.trapDigit ?? 0;
-
-            }
-
-        }
-        catch(err){
-
-            console.error(err);
-
-        }
-
-    }
-
-    document
-        .getElementById(
-            "loadingScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
-    if(password === ""){
-
-        showCover();
-
-    }
-    else{
-
-        startGameUI();
-
-    }
+    return Math.floor(
+        Math.random() * 10000
+    )
+    .toString()
+    .padStart(
+        4,
+        "0"
+    );
 
 }
-
-/* =====================================================
-   COVER
-===================================================== */
-
-function showCover(){
-
-    document
-        .getElementById(
-            "coverScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-    document
-        .getElementById(
-            "coverImage"
-        ).src =
-        gameData.cover;
-
-}
-
-function startGame(){
-
-    currentStage = 0;
-
-    unlockedImages = [];
-
-    loadStage();
-
-    document
-        .getElementById(
-            "coverScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
-    startGameUI();
-
-}
-
-function startGameUI(){
-
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-    renderGallery();
-
-    updateUI();
-
-}
-
-/* =====================================================
-   STAGES
-===================================================== */
 
 function loadStage(){
 
-    const stage =
-
-        gameData.stages[
-            currentStage
+    currentStage =
+        vaultData.stages[
+            currentStageIndex
         ];
 
-    password =
-        String(
-            stage.password || ""
-        ).toUpperCase();
-
-    revealedPassword =
-        buildHiddenPassword(
-            password
-        );
-
-    const settings =
-
-        difficulties[
-            stage.difficulty
-        ];
-
-    maxAlarms =
-        settings.alarms;
-
-    alarms =
-        settings.alarms;
-
-    maxAttempts =
-        settings.attempts;
-
-    attempts =
-        settings.attempts;
+    secretCode =
+        generateSecretCode();
 
     currentCode = "";
 
-    generateDigits();
-
-    saveProgress();
-
-}
-
-function buildHiddenPassword(text){
-
-    return text
-        .split("")
-        .map(char => {
-
-            if(char === " "){
-
-                return " ";
-
-            }
-
-            return "*";
-
-        })
-        .join("");
-
-}
-
-function generateDigits(){
-
-    bonusDigit =
-        Math.floor(
-            Math.random() * 10
+    maxAlarms =
+        calculateAlarms(
+            currentStage.password,
+            currentStage.difficulty
         );
 
-    do{
+    alarms =
+        maxAlarms;
 
-        trapDigit =
-            Math.floor(
-                Math.random() * 10
-            );
+    revealedLetters =
+        new Array(
+            currentStage.password.length
+        ).fill(
+            false
+        );
 
-    }
-    while(
-        trapDigit ===
-        bonusDigit
+    updateStageUI();
+
+    updateAlarms();
+
+    updatePassword();
+
+    updateCodeDisplay();
+
+    clearHints();
+
+    logMessage(
+        `Stage ${
+            currentStageIndex + 1
+        } loaded`
     );
 
-}
+}function updateStageUI(){
 
-/* =====================================================
-   UI
-===================================================== */
-
-function updateUI(){
-
-    const stage =
-
-        gameData.stages[
-            currentStage
-        ];
-
-    document
-        .getElementById(
-            "stageTitle"
-        )
-        .textContent =
+    document.getElementById(
+        "stageLabel"
+    ).textContent =
 
         `Stage ${
-            currentStage + 1
+            currentStageIndex + 1
         } / ${
-            gameData.stages.length
+            vaultData.stages.length
         }`;
 
-    document
-        .getElementById(
-            "difficultyDisplay"
-        )
-        .textContent =
-
-        stage.difficulty
+    document.getElementById(
+        "difficultyBadge"
+    ).textContent =
+        currentStage.difficulty
             .toUpperCase();
 
-    document
-        .getElementById(
-            "vaultImage"
-        )
-        .src =
-        stage.image;
+    document.getElementById(
+        "backgroundImage"
+    ).style.backgroundImage =
 
-    document
-        .getElementById(
-            "passwordDisplay"
-        )
-        .textContent =
-        revealedPassword;
+        `url("${currentStage.image}")`;
 
-    document
-        .getElementById(
-            "attemptsDisplay"
-        )
-        .textContent =
-        attempts;
-
-    document
-        .getElementById(
-            "codeDisplay"
-        )
-        .value =
-        currentCode;
-
-    renderAlarms();
+    document.getElementById(
+        "targetImage"
+    ).src =
+        currentStage.image;
 
 }
 
-function renderAlarms(){
+function updateAlarms(){
 
     const container =
-
         document.getElementById(
-            "alarmsDisplay"
+            "alarmContainer"
         );
 
     container.innerHTML = "";
@@ -511,37 +157,96 @@ function renderAlarms(){
         i++
     ){
 
-        const dot =
+        const alarm =
             document.createElement(
-                "span"
+                "div"
             );
 
-        dot.className =
+        alarm.className =
             "alarm";
 
         container.appendChild(
-            dot
+            alarm
         );
 
     }
 
 }
 
-/* =====================================================
-   VAULT CRACKER
-   PART 2
-   NUMPAD / HACKING / OUTCOMES
-===================================================== */
+function updatePassword(){
 
-/* =====================================================
-   NUMPAD
-===================================================== */
+    const password =
+        currentStage.password;
 
-function addDigit(digit){
+    let display = "";
 
-    if(processingHack){
-        return;
+    for(
+        let i = 0;
+        i < password.length;
+        i++
+    ){
+
+        display +=
+
+            revealedLetters[i]
+
+            ? password[i]
+
+            : "*";
+
+        display += " ";
+
     }
+
+    document.getElementById(
+        "passwordDisplay"
+    ).textContent =
+        display.trim();
+
+    updateImageBlur();
+
+}
+
+function updateImageBlur(){
+
+    const revealedCount =
+
+        revealedLetters.filter(
+            x => x
+        ).length;
+
+    const total =
+        revealedLetters.length;
+
+    const percent =
+
+        total === 0
+
+        ? 0
+
+        : revealedCount / total;
+
+    const blur =
+
+        Math.max(
+            0,
+            40 -
+            (
+                percent * 40
+            )
+        );
+
+    document.getElementById(
+        "targetImage"
+    ).style.filter =
+
+        `blur(${blur}px)`;
+
+}
+
+function addDigit(
+    digit
+){
 
     if(
         currentCode.length >= 4
@@ -551,20 +256,11 @@ function addDigit(digit){
 
     currentCode += digit;
 
-    document
-        .getElementById(
-            "codeDisplay"
-        )
-        .value =
-        currentCode;
+    updateCodeDisplay();
 
 }
 
-function backspaceDigit(){
-
-    if(processingHack){
-        return;
-    }
+function clearCode(){
 
     currentCode =
         currentCode.slice(
@@ -572,293 +268,504 @@ function backspaceDigit(){
             -1
         );
 
-    document
-        .getElementById(
-            "codeDisplay"
-        )
-        .value =
-        currentCode;
+    updateCodeDisplay();
 
 }
 
-function clearCode(){
-
-    if(processingHack){
-        return;
-    }
+function resetCode(){
 
     currentCode = "";
 
-    document
-        .getElementById(
-            "codeDisplay"
-        )
-        .value = "";
+    updateCodeDisplay();
 
 }
 
-/* =====================================================
-   HACK BUTTON
-===================================================== */
+function updateCodeDisplay(){
 
-function hack(){
+    let display =
+        currentCode;
 
-    if(processingHack){
-        return;
-    }
-
-    if(
-        currentCode.length !== 4
+    while(
+        display.length < 4
     ){
 
-        document
-            .getElementById(
-                "resultBox"
-            )
-            .textContent =
-            "ENTER 4 DIGITS";
-
-        return;
+        display += "-";
 
     }
 
-    processingHack = true;
+    document.getElementById(
+        "codeDisplay"
+    ).textContent =
+        display;
 
-    disableInputs();
+}
 
-    attempts--;
+function logMessage(
+    text
+){
 
-    const digits =
-        currentCode.split("");
-
-    let bonusHits = 0;
-    let trapHits = 0;
-
-    digits.forEach(digit=>{
-
-        if(
-            Number(digit) ===
-            bonusDigit
-        ){
-            bonusHits++;
-        }
-
-        if(
-            Number(digit) ===
-            trapDigit
-        ){
-            trapHits++;
-        }
-
-    });
-
-    /* =====================
-       TRAP DAMAGE FIRST
-    ===================== */
-
-    alarms -= trapHits;
-
-    /* =====================
-       ATTEMPTS RESET RULE
-    ===================== */
-
-    if(
-        attempts <= 0
-    ){
-
-        alarms--;
-
-        attempts =
-            maxAttempts;
-
-    }
-
-    const progress =
-
+    const log =
         document.getElementById(
-            "hackProgress"
+            "log"
         );
 
-    progress.style.transition =
-        "none";
+    const div =
+        document.createElement(
+            "div"
+        );
 
-    progress.style.width =
-        "0%";
+    div.className =
+        "logEntry";
 
-    void progress.offsetWidth;
+    div.textContent =
+        text;
 
-    progress.style.transition =
-        "width 1s linear";
-
-    progress.style.width =
-        "100%";
-
-    setTimeout(
-
-        ()=>{
-
-            processHackRolls(
-                bonusHits,
-                trapHits
-            );
-
-        },
-
-        1000
-
+    log.prepend(
+        div
     );
 
 }
 
-/* =====================================================
-   PROCESS ROLLS
-===================================================== */
+function clearHints(){
 
-function processHackRolls(
+    document.getElementById(
+        "hintLights"
+    ).innerHTML = "";
 
-    bonusHits,
-    trapHits
+}
 
+function showModal(
+    title,
+    message
 ){
 
-    const results = [];
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        title;
 
-    if(
-        trapHits > 0
-    ){
+    document.getElementById(
+        "modalMessage"
+    ).textContent =
+        message;
 
-        results.push(
-            `TRAP x${trapHits}`
+    document.getElementById(
+        "modal"
+    ).style.display =
+        "flex";
+
+}
+
+function closeModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display =
+        "none";
+
+}
+
+window.addEventListener(
+    "load",
+    loadStage
+);
+
+const wheelTables = [
+
+    // Stage 1
+
+    [
+        "HACK",
+        "HACK",
+        "HACK",
+
+        "ALARM",
+        "ALARM",
+
+        "SAFE",
+        "SAFE",
+
+        "DECRYPT",
+
+        "DIFFUSE",
+
+        "CAUTION"
+    ],
+
+    // Stage 2
+
+    [
+        "HACK",
+        "HACK",
+
+        "ALARM",
+        "ALARM",
+        "ALARM",
+
+        "SAFE",
+        "SAFE",
+
+        "DECRYPT",
+
+        "DIFFUSE",
+
+        "CAUTION"
+    ],
+
+    // Stage 3
+
+    [
+        "HACK",
+        "HACK",
+
+        "ALARM",
+        "ALARM",
+        "ALARM",
+
+        "SAFE",
+
+        "DECRYPT",
+
+        "DIFFUSE",
+
+        "CAUTION",
+
+        "ALARM"
+    ],
+
+    // Stage 4
+
+    [
+        "HACK",
+
+        "ALARM",
+        "ALARM",
+        "ALARM",
+        "ALARM",
+
+        "SAFE",
+
+        "DECRYPT",
+
+        "DIFFUSE",
+
+        "CAUTION",
+
+        "ALARM"
+    ],
+
+    // Stage 5
+
+    [
+        "HACK",
+
+        "ALARM",
+        "ALARM",
+        "ALARM",
+        "ALARM",
+        "ALARM",
+
+        "SAFE",
+
+        "DECRYPT",
+
+        "DIFFUSE",
+
+        "CAUTION"
+    ]
+
+];
+
+let previousWheelIndex = -1;
+
+async function playHackAnimation(){
+
+    const overlay =
+        document.getElementById(
+            "hackOverlay"
         );
 
-    }
-
-    if(
-        bonusHits > 0
-    ){
-
-        results.push(
-            `BONUS x${bonusHits}`
+    const bar =
+        document.getElementById(
+            "progressInner"
         );
 
-    }
+    const status =
+        document.getElementById(
+            "hackStatus"
+        );
 
-    const totalRolls =
-        1 + bonusHits;
+    overlay.style.display =
+        "flex";
+
+    bar.style.transition =
+        "none";
+
+    bar.style.width =
+        "0%";
+
+    status.textContent =
+        hackMessages[0];
+
+    await new Promise(
+        r => setTimeout(r,20)
+    );
+
+    bar.style.transition =
+        "width .5s linear";
+
+    bar.style.width =
+        "100%";
+
+    let index = 0;
+
+    const interval =
+        setInterval(()=>{
+
+            index++;
+
+            status.textContent =
+                hackMessages[
+                    index %
+                    hackMessages.length
+                ];
+
+        },125);
+
+    await new Promise(
+        r => setTimeout(r,500)
+    );
+
+    clearInterval(
+        interval
+    );
+
+    overlay.style.display =
+        "none";
+
+}
+
+function buildHints(
+    guess,
+    answer
+){
+
+    const result =
+        new Array(4);
+
+    const answerArr =
+        answer.split("");
+
+    const guessArr =
+        guess.split("");
 
     for(
         let i = 0;
-        i < totalRolls;
+        i < 4;
         i++
     ){
 
-        const outcome =
-            getRandomOutcome();
+        if(
+            guessArr[i] ===
+            answerArr[i]
+        ){
 
-        results.push(
-            outcome
-        );
+            result[i] =
+                "green";
 
-        applyOutcome(
-            outcome
-        );
+            answerArr[i] =
+                null;
+
+            guessArr[i] =
+                null;
+
+        }
 
     }
 
-    document
-        .getElementById(
-            "resultBox"
-        )
-        .textContent =
-        results.join("\n");
+    for(
+        let i = 0;
+        i < 4;
+        i++
+    ){
 
-    updateUI();
+        if(
+            guessArr[i] === null
+        ){
+            continue;
+        }
 
-    saveProgress();
+        const matchIndex =
 
-    generateDigits();
+            answerArr.indexOf(
+                guessArr[i]
+            );
 
-    currentCode = "";
+        if(
+            matchIndex !== -1
+        ){
 
-    document
-        .getElementById(
-            "codeDisplay"
-        )
-        .value = "";
+            result[i] =
+                "yellow";
 
-    setTimeout(
+            answerArr[
+                matchIndex
+            ] = null;
 
-        ()=>{
+        }else{
 
-            document
-                .getElementById(
-                    "hackProgress"
-                )
-                .style.width =
-                "0%";
+            result[i] =
+                "grey";
 
-            document
-                .getElementById(
-                    "resultBox"
-                )
-                .textContent =
-                "";
+        }
 
-            processingHack =
-                false;
+    }
 
-            enableInputs();
+    return result;
 
-            checkState();
+}
 
-        },
+function showHints(
+    hints
+){
 
-        1200
+    const container =
+        document.getElementById(
+            "hintLights"
+        );
 
+    container.innerHTML = "";
+
+    hints.forEach(
+        colour=>{
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                `hint ${colour}`;
+
+            container.appendChild(
+                div
+            );
+
+        }
     );
 
 }
 
-/* =====================================================
-   RANDOM OUTCOME
-===================================================== */
+function revealRandomLetters(
+    amount
+){
 
-function getRandomOutcome(){
+    const available = [];
 
-    const pool =
+    for(
+        let i = 0;
+        i < revealedLetters.length;
+        i++
+    ){
 
-        outcomePools[
+        if(
+            !revealedLetters[i]
+        ){
+
+            available.push(i);
+
+        }
+
+    }
+
+    amount =
+        Math.min(
+            amount,
+            available.length
+        );
+
+    for(
+        let i = 0;
+        i < amount;
+        i++
+    ){
+
+        const randomIndex =
+
+            Math.floor(
+                Math.random() *
+                available.length
+            );
+
+        const letterIndex =
+
+            available.splice(
+                randomIndex,
+                1
+            )[0];
+
+        revealedLetters[
+            letterIndex
+        ] = true;
+
+    }
+
+    updatePassword();
+
+}
+
+function passwordFullyRevealed(){
+
+    return revealedLetters.every(
+        x => x
+    );
+
+}
+
+function spinOutcome(){
+
+    const wheel =
+
+        wheelTables[
             Math.min(
-                currentStage,
-                4
+                currentStageIndex,
+                wheelTables.length - 1
             )
         ];
 
-    return pool[
+    previousWheelIndex =
+
         Math.floor(
-            Math.random()
-            *
-            pool.length
-        )
+            Math.random() *
+            wheel.length
+        );
+
+    return wheel[
+        previousWheelIndex
     ];
 
 }
 
-/* =====================================================
-   APPLY OUTCOME
-===================================================== */
+function applyOutcome(
+    outcome
+){
 
-function applyOutcome(outcome){
+    document.getElementById(
+        "wheelResult"
+    ).textContent =
+        outcome;
 
     switch(outcome){
 
-        case "HACKED":
+        case "HACK":
 
-            revealLetter();
+            revealRandomLetters(
+                1
+            );
 
-            break;
-
-        case "TRY_AGAIN":
+            logMessage(
+                "HACK: Revealed 1 letter"
+            );
 
             break;
 
@@ -866,475 +773,336 @@ function applyOutcome(outcome){
 
             alarms--;
 
+            updateAlarms();
+
+            logMessage(
+                "ALARM: Security triggered"
+            );
+
             break;
 
-        case "FIREWALL":
+        case "SAFE":
+
+            logMessage(
+                "SAFE: No effect"
+            );
+
+            break;
+
+        case "DIFFUSE":
 
             alarms++;
 
+            updateAlarms();
+
+            logMessage(
+                "DIFFUSE: Alarm added"
+            );
+
             break;
 
-        case "DECRYPTING":
+        case "DECRYPT":
 
-            attempts += 2;
+            revealRandomLetters(
+                3
+            );
+
+            logMessage(
+                "DECRYPT: Revealed 3 letters"
+            );
+
+            break;
+
+        case "CAUTION":
+
+            applyCaution();
 
             break;
 
     }
+
+    checkStageState();
 
 }
 
-/* =====================================================
-   PASSWORD REVEAL
-===================================================== */
+function applyCaution(){
 
-function revealLetter(){
+    const wheel =
 
-    const hidden = [];
-
-    for(
-        let i = 0;
-        i < password.length;
-        i++
-    ){
-
-        if(
-            revealedPassword[i]
-            === "*"
-        ){
-
-            hidden.push(i);
-
-        }
-
-    }
-
-    if(
-        hidden.length === 0
-    ){
-        return;
-    }
-
-    const revealIndex =
-
-        hidden[
-            Math.floor(
-                Math.random()
-                *
-                hidden.length
+        wheelTables[
+            Math.min(
+                currentStageIndex,
+                wheelTables.length - 1
             )
         ];
 
-    const chars =
-        revealedPassword
-        .split("");
-
-    chars[
-        revealIndex
-    ] =
-    password[
-        revealIndex
-    ];
-
-    revealedPassword =
-        chars.join("");
-
-}
-
-/* =====================================================
-   INPUT LOCKING
-===================================================== */
-
-function disableInputs(){
-
-    document
-        .querySelectorAll(
-            ".numBtn"
-        )
-        .forEach(btn=>{
-
-            btn.disabled = true;
-
-        });
-
-    document
-        .getElementById(
-            "hackButton"
-        )
-        .disabled = true;
-
-}
-
-function enableInputs(){
-
-    document
-        .querySelectorAll(
-            ".numBtn"
-        )
-        .forEach(btn=>{
-
-            btn.disabled = false;
-
-        });
-
-    document
-        .getElementById(
-            "hackButton"
-        )
-        .disabled = false;
-
-}
-
-/* =====================================================
-   STATE CHECKS
-===================================================== */
-
-function checkState(){
+    const nextIndex =
+        previousWheelIndex + 1;
 
     if(
-        revealedPassword ===
-        password
+        nextIndex <
+        wheel.length &&
+        wheel[nextIndex] ===
+        "ALARM"
     ){
 
-        stageComplete();
-        return;
+        alarms -= 3;
+
+        updateAlarms();
+
+        logMessage(
+            "CAUTION: Lost 3 alarms"
+        );
+
+    }else{
+
+        logMessage(
+            "CAUTION: No effect"
+        );
 
     }
+
+}
+
+function checkStageState(){
 
     if(
         alarms <= 0
     ){
 
-        stageReset();
+        showModal(
+            "SECURITY LOCKDOWN",
+            "The vault has reset."
+        );
+
+        setTimeout(
+            resetStage,
+            100
+        );
+
         return;
+
+    }
+
+    if(
+        passwordFullyRevealed()
+    ){
+
+        completeStage();
 
     }
 
 }
 
-/* =====================================================
-   VAULT CRACKER
-   PART 3
-   STAGE COMPLETE / RESET / GALLERY / VICTORY
-===================================================== */
+function resetStage(){
 
-/* =====================================================
-   STAGE COMPLETE
-===================================================== */
+    alarms =
+        maxAlarms;
 
-function stageComplete(){
+    secretCode =
+        generateSecretCode();
 
-    saveProgress();
+    revealedLetters =
+        new Array(
+            currentStage.password.length
+        ).fill(false);
 
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
+    updateAlarms();
 
-    document
-        .getElementById(
-            "stageCompleteScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    updatePassword();
 
-    document
-        .getElementById(
-            "revealedImage"
-        )
-        .src =
+    clearHints();
 
-        gameData.stages[
-            currentStage
-        ].image;
+    currentCode = "";
+
+    updateCodeDisplay();
+
+    document.getElementById(
+        "wheelResult"
+    ).textContent =
+        "READY";
+
+    logMessage(
+        "Stage reset"
+    );
 
 }
 
-function continueAfterReveal(){
-
-    const image =
-
-        gameData.stages[
-            currentStage
-        ].image;
-
-    unlockedImages.push(
-        image
-    );
-
-    currentStage++;
-
-    saveProgress();
+async function attemptHack(){
 
     if(
-        currentStage >=
-        gameData.stages.length
+        currentCode.length !== 4
+    ){
+        return;
+    }
+
+    await playHackAnimation();
+
+    const hints =
+        buildHints(
+            currentCode,
+            secretCode
+        );
+
+    showHints(
+        hints
+    );
+
+    if(
+        currentCode ===
+        secretCode
     ){
 
-        showVictory();
+        revealRandomLetters(
+            3
+        );
+
+        logMessage(
+            "CODE CRACKED"
+        );
+
+        secretCode =
+            generateSecretCode();
+
+        checkStageState();
+
+    }else{
+
+        const outcome =
+            spinOutcome();
+
+        applyOutcome(
+            outcome
+        );
+
+    }
+
+    currentCode = "";
+
+    updateCodeDisplay();
+
+}
+
+function completeStage(){
+
+    document.getElementById(
+        "targetImage"
+    ).style.filter =
+        "blur(0px)";
+
+    showModal(
+        "VAULT EXPOSED",
+        `Stage ${
+            currentStageIndex + 1
+        } complete.`
+    );
+
+    logMessage(
+        `Stage ${
+            currentStageIndex + 1
+        } complete`
+    );
+
+    setTimeout(
+        advanceStage,
+        300
+    );
+
+}
+
+function advanceStage(){
+
+    closeModal();
+
+    currentStageIndex++;
+
+    if(
+        currentStageIndex >=
+        vaultData.stages.length
+    ){
+
+        unlockBonus();
+
         return;
 
     }
 
     loadStage();
 
-    renderGallery();
-
-    updateUI();
-
-    document
-        .getElementById(
-            "stageCompleteScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
 }
 
-/* =====================================================
-   STAGE RESET
-===================================================== */
-
-function stageReset(){
-
-    saveProgress();
-
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
-    document
-        .getElementById(
-            "resetScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-}
-
-function continueAfterReset(){
-
-    loadStage();
-
-    updateUI();
-
-    document
-        .getElementById(
-            "resetScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-}
-
-/* =====================================================
-   GALLERY
-===================================================== */
-
-function renderGallery(){
-
-    const galleryCard =
-
-        document.getElementById(
-            "galleryCard"
-        );
-
-    const gallery =
-
-        document.getElementById(
-            "gallery"
-        );
-
-    gallery.innerHTML = "";
+function unlockBonus(){
 
     if(
-        unlockedImages.length === 0
+        !vaultData.bonus
     ){
 
-        galleryCard
-            .classList.add(
-                "hidden"
-            );
+        gameComplete();
 
         return;
 
     }
 
-    galleryCard
-        .classList.remove(
-            "hidden"
-        );
+    document.getElementById(
+        "backgroundImage"
+    ).style.backgroundImage =
 
-    unlockedImages.forEach(
+        `url("${vaultData.bonus}")`;
 
-        src => {
+    document.getElementById(
+        "targetImage"
+    ).src =
+        vaultData.bonus;
 
-            const img =
-                document.createElement(
-                    "img"
-                );
+    document.getElementById(
+        "targetImage"
+    ).style.filter =
+        "blur(0px)";
 
-            img.src = src;
+    showModal(
+        "BONUS VAULT",
+        "Bonus image unlocked."
+    );
 
-            gallery.appendChild(
-                img
-            );
+    logMessage(
+        "Bonus image unlocked"
+    );
 
-        }
-
+    setTimeout(
+        gameComplete,
+        300
     );
 
 }
 
-/* =====================================================
-   VICTORY
-===================================================== */
+function gameComplete(){
 
-function showVictory(){
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        "ALL VAULTS EXPOSED";
 
-    localStorage.removeItem(
-        STORAGE_KEY
-    );
+    document.getElementById(
+        "modalMessage"
+    ).textContent =
+        "Mission complete.";
 
-    document
-        .getElementById(
-            "gameScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
+    document.getElementById(
+        "modal"
+    ).style.display =
+        "flex";
 
-    document
-        .getElementById(
-            "stageCompleteScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
+    document.getElementById(
+        "hackBtn"
+    ).disabled = true;
 
-    document
-        .getElementById(
-            "resetScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
+    document.getElementById(
+        "hackBtn"
+    ).style.opacity =
+        ".5";
 
-    document
-        .getElementById(
-            "victoryScreen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-    /* Bonus image */
-
-    if(
-        gameData.bonus
-    ){
-
-        document
-            .getElementById(
-                "bonusImage"
-            )
-            .src =
-            gameData.bonus;
-
-    }
-
-    /* Final gallery */
-
-    const gallery =
-
-        document.getElementById(
-            "finalGallery"
-        );
-
-    gallery.innerHTML = "";
-
-    const images = [
-
-        gameData.cover,
-
-        ...unlockedImages
-
-    ];
-
-    if(
-        gameData.bonus
-    ){
-
-        images.push(
-            gameData.bonus
-        );
-
-    }
-
-    images.forEach(
-
-        src => {
-
-            const img =
-                document.createElement(
-                    "img"
-                );
-
-            img.src = src;
-
-            gallery.appendChild(
-                img
-            );
-
-        }
-
+    logMessage(
+        "Game complete"
     );
 
 }
-
-/* =====================================================
-   AUTO SAVE
-===================================================== */
-
-window.addEventListener(
-
-    "beforeunload",
-
-    ()=>{
-
-        saveProgress();
-
-    }
-
-);
-
-/* =====================================================
-   END OF FILE
-===================================================== */
