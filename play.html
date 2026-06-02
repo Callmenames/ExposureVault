@@ -5,7 +5,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>Vault Cracker</title>
+<title>Exposure Vault</title>
 
 <style>
 
@@ -13,188 +13,174 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
-    font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-    background:#111;
-    color:white;
-    padding:20px;
+    background:#000;
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
 }
+
+/* BACKGROUND */
+
+#backgroundImage{
+    position:fixed;
+    inset:0;
+
+    background-size:cover;
+    background-position:center;
+
+    filter:blur(40px);
+
+    transform:scale(1.15);
+
+    opacity:.45;
+
+    z-index:-2;
+}
+
+#overlay{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    z-index:-1;
+}
+
+/* LAYOUT */
 
 .container{
     max-width:900px;
     margin:auto;
-}
-
-.hidden{
-    display:none;
-}
-
-.card{
-    background:#1c1c1c;
-    border-radius:12px;
     padding:20px;
-    margin-bottom:20px;
 }
 
-.center{
-    text-align:center;
+.panel{
+    background:rgba(20,20,20,.92);
+
+    backdrop-filter:blur(10px);
+
+    border-radius:16px;
+
+    padding:20px;
+
+    border:1px solid
+        rgba(255,255,255,.08);
 }
 
-button{
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-}
+/* HEADER */
 
-.primary{
-    background:#00b894;
-    color:white;
-}
-
-.primary:hover{
-    background:#00a383;
-}
-
-img{
-    width:100%;
-    border-radius:10px;
-}
-
-.previewImage{
-    height:350px;
-    object-fit:cover;
-    filter:blur(18px);
-}
-
-.stageTitle{
-    text-align:center;
-    margin-bottom:10px;
-}
-
-.difficulty{
-    text-align:center;
-    color:#999;
-    margin-bottom:20px;
-    text-transform:uppercase;
-}
-
-.passwordBox{
-    text-align:center;
-    font-size:42px;
-    font-weight:bold;
-    letter-spacing:8px;
-    margin-top:20px;
-    word-break:break-word;
-}
-
-.stats{
-    display:grid;
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(180px,1fr)
-        );
-
-    gap:15px;
-    margin-top:20px;
-}
-
-.stat{
-    background:#222;
-    padding:15px;
-    border-radius:10px;
-    text-align:center;
-}
-
-.statTitle{
-    color:#999;
-    font-size:14px;
-    margin-bottom:8px;
-}
-
-.statValue{
-    font-size:28px;
-    font-weight:bold;
-}
-
-#alarmsDisplay{
+.header{
     display:flex;
-    justify-content:center;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+#difficultyBadge{
+    background:#222;
+    border-radius:20px;
+    padding:8px 14px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* TARGET IMAGE */
+
+#targetFrame{
+    width:100%;
+    height:220px;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    margin-bottom:20px;
+
+    border:2px solid
+        rgba(255,255,255,.1);
+
+    background:#000;
+}
+
+#targetImage{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    filter:blur(40px);
+
+    transition:
+        filter .4s ease;
+}
+
+/* ALARMS */
+
+#alarmContainer{
+    display:flex;
     gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
 }
 
 .alarm{
     width:18px;
     height:18px;
     border-radius:50%;
-    background:#ff2b2b;
+
+    background:#ff3b30;
 
     box-shadow:
-        0 0 6px #ff2b2b,
-        0 0 12px #ff2b2b,
-        0 0 24px #ff2b2b;
+        0 0 10px
+        rgba(255,59,48,.6);
 }
 
-/* ==========================
-   PROGRESS BAR
-========================== */
+/* PASSWORD */
 
-.hackBar{
-    margin-top:20px;
-    height:14px;
-    background:#222;
-    border-radius:8px;
-    overflow:hidden;
-}
+#passwordDisplay{
+    margin-top:15px;
 
-#hackProgress{
-    width:0%;
-    height:100%;
-    background:#00b894;
-}
-
-/* ==========================
-   RESULTS
-========================== */
-
-.resultBox{
     text-align:center;
-    margin-top:20px;
-    min-height:120px;
-    font-size:20px;
-    line-height:1.6;
-    white-space:pre-line;
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    letter-spacing:10px;
+
+    word-break:break-all;
 }
 
-/* ==========================
-   CODE INPUT
-========================== */
-
-.codeInput{
-    margin-top:25px;
-}
+/* CODE */
 
 #codeDisplay{
-
-    width:100%;
-    height:70px;
+    margin-top:20px;
 
     background:#000;
-    color:#00ff66;
 
-    border:2px solid #333;
-    border-radius:10px;
+    border-radius:12px;
+
+    padding:15px;
 
     text-align:center;
-    font-size:38px;
-    font-weight:bold;
-    letter-spacing:12px;
+
+    font-size:36px;
+
+    letter-spacing:10px;
+
+    min-height:75px;
 }
 
-.numpad{
+/* NUMPAD */
 
+.numpad{
     display:grid;
 
     grid-template-columns:
@@ -202,392 +188,368 @@ img{
 
     gap:10px;
 
-    margin-top:15px;
+    margin-top:20px;
 }
 
-.numBtn{
+.numpad button{
+    height:65px;
 
-    height:70px;
-
-    background:#333;
-    color:white;
-
-    font-size:28px;
-    font-weight:bold;
+    border:none;
 
     border-radius:10px;
-}
 
-.numBtn:hover{
-    background:#444;
-}
+    background:#222;
 
-.actionRow{
-
-    display:grid;
-
-    grid-template-columns:
-        1fr 2fr;
-
-    gap:10px;
-
-    margin-top:10px;
-}
-
-.clearBtn{
-
-    height:70px;
-
-    background:#555;
-    color:white;
-
-    font-size:20px;
-}
-
-.hackBtn{
-
-    height:70px;
-
-    background:#00b894;
     color:white;
 
     font-size:24px;
-    font-weight:bold;
+
+    cursor:pointer;
 }
 
-/* ==========================
-   GALLERY
-========================== */
+.numpad button:hover{
+    background:#333;
+}
 
-.gallery{
-    display:grid;
+/* ACTIONS */
 
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(140px,1fr)
-        );
-
+.actions{
+    display:flex;
     gap:10px;
+    margin-top:15px;
+}
+
+.actions button{
+    flex:1;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+}
+
+#hackBtn{
+    background:#00b894;
+}
+
+#clearBtn{
+    background:#636e72;
+}
+
+/* HINTS */
+
+#hintLights{
+    display:flex;
+
+    justify-content:center;
+
+    gap:12px;
+
+    margin-top:20px;
+
+    min-height:22px;
+}
+
+.hint{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+}
+
+.green{
+    background:#00b894;
+}
+
+.yellow{
+    background:#f1c40f;
+}
+
+.grey{
+    background:#636e72;
+}
+
+/* RESULT */
+
+#wheelResult{
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    margin-top:20px;
+
+    min-height:40px;
+}
+
+/* LOG */
+
+#log{
+    margin-top:20px;
+
+    background:#111;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    height:180px;
+
+    overflow-y:auto;
+}
+
+.logEntry{
+    margin-bottom:8px;
+}
+
+/* MODAL */
+
+#modal{
+    position:fixed;
+    inset:0;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(0,0,0,.85);
+
+    z-index:1000;
+}
+
+.modalContent{
+    width:100%;
+    max-width:500px;
+
+    background:#111;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    text-align:center;
+}
+
+.modalContent h2{
+    margin-bottom:15px;
+}
+
+.modalContent button{
+    width:100%;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#00b894;
+
+    color:white;
+
+    cursor:pointer;
 
     margin-top:20px;
 }
 
-.gallery img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
+/* HACKING OVERLAY */
+
+#hackOverlay{
+    position:fixed;
+    inset:0;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(0,0,0,.9);
+
+    z-index:2000;
 }
 
-.revealImage{
-    max-height:700px;
-    object-fit:contain;
+.hackBox{
+    width:90%;
+    max-width:500px;
+}
+
+#hackStatus{
+    text-align:center;
+
+    font-size:28px;
+
+    letter-spacing:4px;
+
+    margin-bottom:20px;
+}
+
+#progressOuter{
+    height:24px;
+
+    background:#222;
+
+    border-radius:12px;
+
+    overflow:hidden;
+}
+
+#progressInner{
+    width:0%;
+
+    height:100%;
+
+    background:#00b894;
 }
 
 </style>
 </head>
 <body>
 
+<div id="backgroundImage"></div>
+<div id="overlay"></div>
+
 <div class="container">
 
-<!-- LOADING -->
+    <div class="panel">
 
-<div
-    id="loadingScreen"
-    class="card center">
+        <div class="header">
 
-    Loading Vault...
+            <div id="stageLabel">
+                Stage 1 / 5
+            </div>
 
-</div>
-
-<!-- COVER -->
-
-<div
-    id="coverScreen"
-    class="card center hidden">
-
-    <h1>Vault Cracker</h1>
-
-    <br>
-
-    <img id="coverImage">
-
-    <br><br>
-
-    <button
-        class="primary"
-        style="width:100%;padding:18px;font-size:22px;"
-        onclick="startGame()">
-
-        Begin Hack
-
-    </button>
-
-</div>
-
-<!-- GAME -->
-
-<div
-    id="gameScreen"
-    class="hidden">
-
-    <div class="card">
-
-        <h2
-            id="stageTitle"
-            class="stageTitle">
-
-            Stage 1
-
-        </h2>
-
-        <div
-            id="difficultyDisplay"
-            class="difficulty">
-
-            EASY
+            <div id="difficultyBadge">
+                Easy
+            </div>
 
         </div>
 
-        <img
-            id="vaultImage"
-            class="previewImage">
+        <h1>EXPOSURE VAULT</h1>
 
-        <div
-            id="passwordDisplay"
-            class="passwordBox">
+        <div id="targetFrame">
 
+            <img
+                id="targetImage"
+                src=""
+                alt="Target">
+
+        </div>
+
+        <h3>Security Alarms</h3>
+
+        <div id="alarmContainer"></div>
+
+        <h3
+            style="margin-top:20px;">
+            Password
+        </h3>
+
+        <div id="passwordDisplay">
             ********
+        </div>
+
+        <div id="codeDisplay">
+            ----
+        </div>
+
+        <div class="numpad">
+
+            <button onclick="addDigit('1')">1</button>
+            <button onclick="addDigit('2')">2</button>
+            <button onclick="addDigit('3')">3</button>
+
+            <button onclick="addDigit('4')">4</button>
+            <button onclick="addDigit('5')">5</button>
+            <button onclick="addDigit('6')">6</button>
+
+            <button onclick="addDigit('7')">7</button>
+            <button onclick="addDigit('8')">8</button>
+            <button onclick="addDigit('9')">9</button>
+
+            <button onclick="clearCode()">⌫</button>
+            <button onclick="addDigit('0')">0</button>
+            <button onclick="resetCode()">C</button>
 
         </div>
 
-        <div class="stats">
+        <div class="actions">
 
-            <div class="stat">
+            <button
+                id="hackBtn"
+                onclick="attemptHack()">
+                HACK
+            </button>
 
-                <div class="statTitle">
-                    Attempts
-                </div>
-
-                <div
-                    id="attemptsDisplay"
-                    class="statValue">
-
-                    10
-
-                </div>
-
-            </div>
-
-            <div class="stat">
-
-                <div class="statTitle">
-                    Alarms
-                </div>
-
-                <div
-                    id="alarmsDisplay"
-                    class="statValue">
-
-                </div>
-
-            </div>
+            <button
+                id="clearBtn"
+                onclick="resetCode()">
+                CLEAR
+            </button>
 
         </div>
 
-        <div class="hackBar">
+        <div id="hintLights"></div>
 
-            <div id="hackProgress"></div>
-
+        <div id="wheelResult">
+            READY
         </div>
 
-        <div
-            id="resultBox"
-            class="resultBox">
-
-        </div>
-
-        <!-- CODE ENTRY -->
-
-        <div class="codeInput">
-
-            <input
-                id="codeDisplay"
-                type="text"
-                value=""
-                readonly>
-
-            <div class="numpad">
-
-                <button class="numBtn" onclick="addDigit('1')">1</button>
-                <button class="numBtn" onclick="addDigit('2')">2</button>
-                <button class="numBtn" onclick="addDigit('3')">3</button>
-
-                <button class="numBtn" onclick="addDigit('4')">4</button>
-                <button class="numBtn" onclick="addDigit('5')">5</button>
-                <button class="numBtn" onclick="addDigit('6')">6</button>
-
-                <button class="numBtn" onclick="addDigit('7')">7</button>
-                <button class="numBtn" onclick="addDigit('8')">8</button>
-                <button class="numBtn" onclick="addDigit('9')">9</button>
-
-                <button class="numBtn" onclick="backspaceDigit()">⌫</button>
-                <button class="numBtn" onclick="addDigit('0')">0</button>
-                <button class="numBtn" onclick="clearCode()">C</button>
-
-            </div>
-
-            <div class="actionRow">
-
-                <button
-                    class="clearBtn"
-                    onclick="clearCode()">
-
-                    CLEAR
-
-                </button>
-
-                <button
-                    id="hackButton"
-                    class="hackBtn"
-                    onclick="hack()">
-
-                    HACK
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- GALLERY -->
-
-    <div
-        id="galleryCard"
-        class="card hidden">
-
-        <h2>
-            Vault Contents
-        </h2>
-
-        <div
-            id="gallery"
-            class="gallery">
-
-        </div>
+        <div id="log"></div>
 
     </div>
 
 </div>
 
-<!-- STAGE COMPLETE -->
+<!-- MODAL -->
 
-<div
-    id="stageCompleteScreen"
-    class="card center hidden">
+<div id="modal">
 
-    <h1>
-        ACCESS GRANTED
-    </h1>
+    <div class="modalContent">
 
-    <br>
+        <h2 id="modalTitle"></h2>
 
-    <img
-        id="revealedImage"
-        class="revealImage">
+        <p id="modalMessage"></p>
 
-    <br><br>
-
-    <button
-        class="primary"
-        style="width:100%;padding:18px;font-size:22px;"
-        onclick="continueAfterReveal()">
-
-        Continue
-
-    </button>
-
-</div>
-
-<!-- RESET -->
-
-<div
-    id="resetScreen"
-    class="card center hidden">
-
-    <h1>
-        SECURITY LOCKOUT
-    </h1>
-
-    <br>
-
-    <p>
-        Too many alarms were triggered.
-    </p>
-
-    <br>
-
-    <p>
-        The password has been reset.
-    </p>
-
-    <br>
-
-    <button
-        class="primary"
-        style="width:100%;padding:18px;font-size:22px;"
-        onclick="continueAfterReset()">
-
-        Try Again
-
-    </button>
-
-</div>
-
-<!-- VICTORY -->
-
-<div
-    id="victoryScreen"
-    class="card center hidden">
-
-    <h1>
-        VAULT OPENED
-    </h1>
-
-    <br>
-
-    <h2>
-        Bonus Reward
-    </h2>
-
-    <br>
-
-    <img
-        id="bonusImage"
-        class="revealImage">
-
-    <br><br>
-
-    <h2>
-        Complete Collection
-    </h2>
-
-    <br>
-
-    <div
-        id="finalGallery"
-        class="gallery">
+        <button onclick="closeModal()">
+            Continue
+        </button>
 
     </div>
 
 </div>
+
+<!-- HACKING SCREEN -->
+
+<div id="hackOverlay">
+
+    <div class="hackBox">
+
+        <div id="hackStatus">
+            HACKING...
+        </div>
+
+        <div id="progressOuter">
+
+            <div id="progressInner"></div>
+
+        </div>
+
+    </div>
 
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-<script src="js/play.js"></script>
+<script src="play.js"></script>
 
 </body>
 </html>
