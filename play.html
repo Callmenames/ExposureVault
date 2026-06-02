@@ -1,395 +1,293 @@
-<!DOCTYPE html>
-
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
-<title>Exposure Vault</title>
-
-<style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,Helvetica,sans-serif;
-}
-
-body{
-    background:#111;
-    color:white;
-    padding:20px;
-}
-
-.container{
-    max-width:900px;
-    margin:auto;
-}
-
-.hidden{
-    display:none;
-}
-
-.card{
-    background:#1c1c1c;
-    border-radius:12px;
-    padding:20px;
-    margin-bottom:20px;
-}
-
-.center{
-    text-align:center;
-}
-
-button{
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.primary{
-    background:#00b894;
-    color:white;
-}
-
-.primary:hover{
-    background:#00a383;
-}
-
-img{
-    width:100%;
-    border-radius:10px;
-}
-
-.coverImage{
-    max-height:600px;
-    object-fit:cover;
-}
-
-.previewImage{
-    height:350px;
-    object-fit:cover;
-    filter:blur(20px);
-}
-
-.revealImage{
-    max-height:700px;
-    object-fit:contain;
-}
-
-.stageTitle{
-    text-align:center;
-    margin-bottom:10px;
-}
-
-.difficulty{
-    text-align:center;
-    color:#999;
-    margin-bottom:20px;
-    text-transform:uppercase;
-}
-
-.passwordDisplay{
-    text-align:center;
-    font-size:42px;
-    font-weight:bold;
-    letter-spacing:8px;
-    margin-top:20px;
-    word-break:break-word;
-}
-
-.alarmContainer{
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    margin-top:20px;
-}
-
-.alarm{
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    background:#ff3b3b;
-    box-shadow:
-        0 0 8px #ff3b3b,
-        0 0 16px #ff3b3b;
-}
-
-.codeDisplay{
-    margin-top:25px;
-    text-align:center;
-    font-size:40px;
-    font-weight:bold;
-    letter-spacing:12px;
-    min-height:50px;
-}
-
-.keypad{
-    margin-top:20px;
-    display:grid;
-    grid-template-columns:
-        repeat(3,1fr);
-    gap:10px;
-}
-
-.keypad button{
-    padding:18px;
-    font-size:24px;
-}
-
-.numberBtn{
-    background:#333;
-    color:white;
-}
-
-.numberBtn:hover{
-    background:#444;
-}
-
-.clearBtn{
-    background:#555;
-    color:white;
-}
-
-.hackBtn{
-    background:#00b894;
-    color:white;
-}
-
-.resultBox{
-    margin-top:20px;
-    text-align:center;
-    font-size:26px;
-    font-weight:bold;
-    min-height:40px;
-}
-
-.history{
-    margin-top:25px;
-}
-
-.history h3{
-    margin-bottom:10px;
-}
-
-.historyList{
-    background:#222;
-    border-radius:10px;
-    padding:15px;
-    max-height:220px;
-    overflow-y:auto;
-}
-
-.historyEntry{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:8px;
-    font-family:monospace;
-    font-size:18px;
-}
-
-.gallery{
-    display:grid;
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(140px,1fr)
-        );
-    gap:10px;
-    margin-top:20px;
-}
-
-.gallery img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
-}
-
-.green{
-    color:#2ecc71;
-}
-
-.yellow{
-    color:#f1c40f;
-}
-
-.grey{
-    color:#777;
-}
-
-</style>
-
-</head>
 <body>
 
 <div class="container">
 
-<!-- LOADING -->
-
-<div
-    id="loadingScreen"
-    class="card center">
-
-```
-Loading Vault...
-```
-
-</div>
-
-<!-- COVER -->
-
-<div
-    id="coverScreen"
-    class="card center hidden">
-
-```
-<h1>Exposure Vault</h1>
-
-<br>
-
-<img
-    id="coverImage"
-    class="coverImage">
-
-<br><br>
-
-<button
-    class="primary"
-    style="width:100%;padding:18px;font-size:22px;"
-    onclick="startGame()">
-
-    Begin Exposure
-
-</button>
-```
-
-</div>
-
-<!-- GAME -->
-
-<div
-    id="gameScreen"
-    class="hidden">
-
-```
-<div class="card">
-
-    <h2
-        id="stageTitle"
-        class="stageTitle">
-
-        Stage 1 / 5
-
-    </h2>
+    <!-- LOADING -->
 
     <div
-        id="difficultyDisplay"
-        class="difficulty">
+        id="loadingScreen"
+        class="card center">
 
-        EASY
+        Loading Vault...
 
     </div>
 
-    <img
-        id="vaultImage"
-        class="previewImage">
+    <!-- COVER -->
 
     <div
-        id="passwordDisplay"
-        class="passwordDisplay">
+        id="coverScreen"
+        class="card center hidden">
 
-        ********
+        <h1>Exposure Vault</h1>
 
-    </div>
+        <br>
 
-    <div
-        id="alarmContainer"
-        class="alarmContainer">
+        <img
+            id="coverImage"
+            class="coverImage">
 
-    </div>
-
-    <div
-        id="codeDisplay"
-        class="codeDisplay">
-
-        ----
-
-    </div>
-
-    <div class="keypad">
+        <br><br>
 
         <button
-            class="numberBtn"
-            onclick="pressDigit('1')">1</button>
+            class="primary"
+            style="width:100%;padding:18px;font-size:22px;"
+            onclick="startGame()">
 
-        <button
-            class="numberBtn"
-            onclick="pressDigit('2')">2</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('3')">3</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('4')">4</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('5')">5</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('6')">6</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('7')">7</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('8')">8</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('9')">9</button>
-
-        <button
-            class="clearBtn"
-            onclick="clearCode()">C</button>
-
-        <button
-            class="numberBtn"
-            onclick="pressDigit('0')">0</button>
-
-        <button
-            class="hackBtn"
-            onclick="hack()">
-
-            HACK
+            Begin Exposure
 
         </button>
 
     </div>
 
+    <!-- GAME -->
+
     <div
-        id="resultBox"
-        class="resultBox">
+        id="gameScreen"
+        class="hidden">
+
+        <div class="card">
+
+            <h2
+                id="stageTitle"
+                class="stageTitle">
+
+                Stage 1 / 5
+
+            </h2>
+
+            <div
+                id="difficultyDisplay"
+                class="difficulty">
+
+                EASY
+
+            </div>
+
+            <img
+                id="vaultImage"
+                class="previewImage">
+
+            <div
+                id="passwordDisplay"
+                class="passwordDisplay">
+
+                ********
+
+            </div>
+
+            <div
+                id="alarmContainer"
+                class="alarmContainer">
+
+            </div>
+
+            <div
+                id="codeDisplay"
+                class="codeDisplay">
+
+                ----
+
+            </div>
+
+            <div class="keypad">
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('1')">1</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('2')">2</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('3')">3</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('4')">4</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('5')">5</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('6')">6</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('7')">7</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('8')">8</button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('9')">9</button>
+
+                <button
+                    class="clearBtn"
+                    onclick="clearCode()">
+
+                    C
+
+                </button>
+
+                <button
+                    class="numberBtn"
+                    onclick="pressDigit('0')">0</button>
+
+                <button
+                    class="hackBtn"
+                    onclick="hack()">
+
+                    HACK
+
+                </button>
+
+            </div>
+
+            <div
+                id="resultBox"
+                class="resultBox">
+
+            </div>
+
+            <div class="history">
+
+                <h3>
+                    Access Log
+                </h3>
+
+                <div
+                    id="historyList"
+                    class="historyList">
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- GALLERY -->
+
+        <div
+            id="galleryCard"
+            class="card hidden">
+
+            <h2>
+                Exposed Images
+            </h2>
+
+            <div
+                id="gallery"
+                class="gallery">
+
+            </div>
+
+        </div>
 
     </div>
 
-    <div class="history">
+    <!-- STAGE COMPLETE -->
 
-        <h3>
-            Access Log
-        </h3>
+    <div
+        id="stageCompleteScreen"
+        class="card center hidden">
+
+        <h1>
+            IMAGE EXPOSED
+        </h1>
+
+        <br>
+
+        <img
+            id="revealedImage"
+            class="revealImage">
+
+        <br><br>
+
+        <button
+            class="primary"
+            style="width:100%;padding:18px;font-size:22px;"
+            onclick="continueAfterReveal()">
+
+            Continue
+
+        </button>
+
+    </div>
+
+    <!-- LOCKDOWN -->
+
+    <div
+        id="resetScreen"
+        class="card center hidden">
+
+        <h1>
+            SECURITY LOCKDOWN
+        </h1>
+
+        <br>
+
+        <p>
+            The vault has reset.
+        </p>
+
+        <br>
+
+        <p>
+            Password hidden again.
+        </p>
+
+        <br>
+
+        <p>
+            New access code generated.
+        </p>
+
+        <br><br>
+
+        <button
+            class="primary"
+            style="width:100%;padding:18px;font-size:22px;"
+            onclick="continueAfterReset()">
+
+            Retry Stage
+
+        </button>
+
+    </div>
+
+    <!-- VICTORY -->
+
+    <div
+        id="victoryScreen"
+        class="card center hidden">
+
+        <h1>
+            BONUS VAULT UNLOCKED
+        </h1>
+
+        <br>
+
+        <img
+            id="bonusImage"
+            class="revealImage">
+
+        <br><br>
+
+        <h2>
+            Complete Collection
+        </h2>
+
+        <br>
 
         <div
-            id="historyList"
-            class="historyList">
+            id="finalGallery"
+            class="gallery">
 
         </div>
 
@@ -397,140 +295,7 @@ Loading Vault...
 
 </div>
 
-<!-- GALLERY -->
-
-<div
-    id="galleryCard"
-    class="card hidden">
-
-    <h2>
-        Exposed Images
-    </h2>
-
-    <div
-        id="gallery"
-        class="gallery">
-
-    </div>
-
-</div>
-```
-
-</div>
-
-<!-- STAGE COMPLETE -->
-
-<div
-    id="stageCompleteScreen"
-    class="card center hidden">
-
-```
-<h1>
-    IMAGE EXPOSED
-</h1>
-
-<br>
-
-<img
-    id="revealedImage"
-    class="revealImage">
-
-<br><br>
-
-<button
-    class="primary"
-    style="width:100%;padding:18px;font-size:22px;"
-    onclick="continueAfterReveal()">
-
-    Continue
-
-</button>
-```
-
-</div>
-
-<!-- LOCKDOWN -->
-
-<div
-    id="resetScreen"
-    class="card center hidden">
-
-```
-<h1>
-    SECURITY LOCKDOWN
-</h1>
-
-<br>
-
-<p>
-    The vault has reset.
-</p>
-
-<br>
-
-<p>
-    Password hidden again.
-</p>
-
-<br>
-
-<p>
-    New access code generated.
-</p>
-
-<br><br>
-
-<button
-    class="primary"
-    style="width:100%;padding:18px;font-size:22px;"
-    onclick="continueAfterReset()">
-
-    Retry Stage
-
-</button>
-```
-
-</div>
-
-<!-- VICTORY -->
-
-<div
-    id="victoryScreen"
-    class="card center hidden">
-
-```
-<h1>
-    BONUS VAULT UNLOCKED
-</h1>
-
-<br>
-
-<img
-    id="bonusImage"
-    class="revealImage">
-
-<br><br>
-
-<h2>
-    Complete Collection
-</h2>
-
-<br>
-
-<div
-    id="finalGallery"
-    class="gallery">
-
-</div>
-```
-
-</div>
-
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-
 <script src="js/play.js"></script>
 
 </body>
-</html>
