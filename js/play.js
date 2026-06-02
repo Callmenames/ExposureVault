@@ -1,8 +1,3 @@
-/* =====================================================
-   EXPOSURE VAULT
-   PART 1
-   Core State / Loading / Saving / Stage Setup
-===================================================== */
 
 let gameData = null;
 
