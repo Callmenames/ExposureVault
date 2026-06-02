@@ -1,10 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>Vault Cracker</title>
 
@@ -45,12 +45,12 @@ body{
 
 button{
     width:100%;
-    padding:15px;
+    padding:18px;
     border:none;
     border-radius:10px;
     cursor:pointer;
-    font-size:18px;
-    margin-top:10px;
+    font-size:22px;
+    font-weight:bold;
 }
 
 .primary{
@@ -63,127 +63,60 @@ button{
 }
 
 img{
-    max-width:100%;
+    width:100%;
     border-radius:10px;
 }
 
-.statRow{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:12px 0;
-    font-size:20px;
+.previewImage{
+    height:350px;
+    object-fit:cover;
+    filter:blur(18px);
 }
 
-#pinDisplay{
-    font-size:28px;
+.passwordBox{
+    text-align:center;
+    font-size:42px;
+    letter-spacing:8px;
+    font-weight:bold;
+    word-break:break-word;
+    margin-top:20px;
 }
 
-#wheelWrapper{
-    width:340px;
-    height:340px;
-    margin:20px auto;
-    position:relative;
-}
-
-#wheelPointer{
-    position:absolute;
-    top:-15px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:10;
-    font-size:40px;
-}
-
-#wheel{
-    width:340px;
-    height:340px;
-    border-radius:50%;
-    border:8px solid #444;
-
-    transition:
-        transform 4s
-        cubic-bezier(
-            .17,
-            .67,
-            .13,
-            .99
+.stats{
+    display:grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px,1fr)
         );
+    gap:15px;
+    margin-top:20px;
+}
+
+.stat{
+    background:#222;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.statTitle{
+    color:#999;
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+.statValue{
+    font-size:26px;
+    font-weight:bold;
 }
 
 .resultBox{
-    margin-top:20px;
-    font-size:24px;
+    text-align:center;
+    font-size:28px;
     font-weight:bold;
-    min-height:40px;
-}
-
-#legend{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            1fr
-        );
-
-    gap:10px;
-
     margin-top:20px;
-
-    text-align:left;
-
-}
-
-.legendItem{
-
-    display:flex;
-    align-items:center;
-
-    background:#222;
-
-    padding:10px;
-
-    border-radius:8px;
-
-}
-
-.legendColor{
-
-    width:18px;
-    height:18px;
-
-    border-radius:4px;
-
-    margin-right:10px;
-
-    flex-shrink:0;
-
-}
-
-.legendRed{
-    background:#e74c3c;
-}
-
-.legendGold{
-    background:#f1c40f;
-}
-
-.legendBlue{
-    background:#3498db;
-}
-
-.legendGreen{
-    background:#27ae60;
-}
-
-.legendLightGreen{
-    background:#2ecc71;
-}
-
-.legendGrey{
-    background:#7f8c8d;
+    min-height:40px;
 }
 
 .gallery{
@@ -193,7 +126,9 @@ img{
             auto-fit,
             minmax(140px,1fr)
         );
+
     gap:10px;
+    margin-top:20px;
 }
 
 .gallery img{
@@ -202,13 +137,21 @@ img{
     object-fit:cover;
 }
 
-.bigImage{
-    max-width:100%;
-    max-height:75vh;
+.revealImage{
+    max-height:600px;
+    object-fit:contain;
 }
 
-#difficultyDisplay{
-    font-weight:bold;
+.stageTitle{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.difficulty{
+    text-align:center;
+    color:#aaa;
+    margin-bottom:15px;
+    text-transform:uppercase;
 }
 
 </style>
@@ -217,7 +160,7 @@ img{
 
 <div class="container">
 
-<!-- Loading -->
+<!-- LOADING -->
 
 <div
     id="loadingScreen"
@@ -227,19 +170,18 @@ img{
 
 </div>
 
-<!-- Cover -->
+<!-- COVER -->
 
 <div
     id="coverScreen"
     class="card center hidden">
 
-    <h1>
-        Vault Cracker
-    </h1>
+    <h1>Vault Cracker</h1>
 
     <br>
 
-    <img id="coverImage">
+    <img
+        id="coverImage">
 
     <br><br>
 
@@ -247,13 +189,13 @@ img{
         class="primary"
         onclick="startGame()">
 
-        Start Cracking
+        Begin Hack
 
     </button>
 
 </div>
 
-<!-- Main Game -->
+<!-- GAME -->
 
 <div
     id="gameScreen"
@@ -261,110 +203,69 @@ img{
 
     <div class="card">
 
-        <h2 id="stageTitle">
+        <h2
+            id="stageTitle"
+            class="stageTitle">
 
-            Stage 1 / 5
+            Stage 1
 
         </h2>
 
-        <div class="statRow">
+        <div
+            id="difficultyDisplay"
+            class="difficulty">
 
-            <span>
-                Difficulty
-            </span>
-
-            <span id="difficultyDisplay">
-
-                EASY
-
-            </span>
+            EASY
 
         </div>
 
-        <div class="statRow">
+        <img
+            id="vaultImage"
+            class="previewImage">
 
-            <span>
-                Pins Remaining
-            </span>
+        <div
+            id="passwordDisplay"
+            class="passwordBox">
 
-            <span id="pinDisplay">
-
-                🔑🔑🔑🔑🔑
-
-            </span>
+            ********
 
         </div>
 
-        <div class="statRow">
+        <div class="stats">
 
-            <span>
-                Lives
-            </span>
+            <div class="stat">
 
-            <span id="livesDisplay">
+                <div class="statTitle">
+                    Attempts
+                </div>
 
-                ❤❤❤
+                <div
+                    id="attemptsDisplay"
+                    class="statValue">
 
-            </span>
+                    10
 
-        </div>
+                </div>
 
-        <div class="statRow">
-
-            <span>
-                Shield
-            </span>
-
-            <span id="shieldDisplay">
-
-                None
-
-            </span>
-
-        </div>
-
-        <div class="statRow">
-
-            <span>
-                Spins Remaining
-            </span>
-
-            <span id="spinsDisplay">
-
-                0
-
-            </span>
-
-        </div>
-
-    </div>
-
-    <!-- Wheel -->
-
-    <div class="card center">
-
-        <div id="wheelWrapper">
-
-            <div id="wheelPointer">
-                ▼
             </div>
 
-            <canvas
-                id="wheel"
-                width="340"
-                height="340">
-            </canvas>
+            <div class="stat">
+
+                <div class="statTitle">
+                    Alarms
+                </div>
+
+                <div
+                    id="alarmsDisplay"
+                    class="statValue">
+
+                    ❤❤❤
+
+                </div>
+
+            </div>
 
         </div>
-
-        <button
-            id="spinButton"
-            class="primary"
-            onclick="spinWheel()">
-
-            Spin Wheel
-
-        </button>
 
         <div
             id="resultBox"
@@ -372,97 +273,26 @@ img{
 
         </div>
 
-        <!-- Legend -->
+        <button
+            id="hackButton"
+            class="primary"
+            onclick="hack()">
 
-        <div id="legend">
+            HACK
 
-            <div class="legendItem">
-
-                <span
-                    class="
-                    legendColor
-                    legendGold">
-                </span>
-
-                Pin Crack
-
-            </div>
-
-            <div class="legendItem">
-
-                <span
-                    class="
-                    legendColor
-                    legendRed">
-                </span>
-
-                Lose Life
-
-            </div>
-
-            <div class="legendItem">
-
-                <span
-                    class="
-                    legendColor
-                    legendBlue">
-                </span>
-
-                Shield
-
-            </div>
-
-            <div class="legendItem">
-
-                <span
-                    class="
-                    legendColor
-                    legendGreen">
-                </span>
-
-                +2 Spins
-
-            </div>
-
-            <div class="legendItem">
-
-                <span
-                    class="
-                    legendColor
-                    legendLightGreen">
-                </span>
-
-                +5 Spins
-
-            </div>
-
-            <div class="legendItem">
-
-                <span
-                    class="
-                    legendColor
-                    legendGrey">
-                </span>
-
-                Spin Again
-
-            </div>
-
-        </div>
+        </button>
 
     </div>
 
-    <!-- Gallery -->
+    <!-- GALLERY -->
 
     <div
         id="galleryCard"
         class="card hidden">
 
         <h2>
-            Unlocked Images
+            Vault Contents
         </h2>
-
-        <br>
 
         <div
             id="gallery"
@@ -474,21 +304,21 @@ img{
 
 </div>
 
-<!-- Stage Complete -->
+<!-- STAGE COMPLETE -->
 
 <div
     id="stageCompleteScreen"
     class="card center hidden">
 
     <h1>
-        Vault Cracked
+        ACCESS GRANTED
     </h1>
 
     <br>
 
     <img
         id="revealedImage"
-        class="bigImage">
+        class="revealImage">
 
     <br><br>
 
@@ -502,30 +332,26 @@ img{
 
 </div>
 
-<!-- Stage Reset -->
+<!-- RESET -->
 
 <div
     id="resetScreen"
     class="card center hidden">
 
     <h1>
-        Security Reset
+        SECURITY LOCKOUT
     </h1>
 
     <br>
 
     <p>
-
-        You lost all lives.
-
+        Too many alarms were triggered.
     </p>
 
     <br>
 
     <p>
-
-        The vault has reset.
-
+        The password has been reset.
     </p>
 
     <br>
@@ -540,14 +366,14 @@ img{
 
 </div>
 
-<!-- Victory -->
+<!-- VICTORY -->
 
 <div
     id="victoryScreen"
     class="card center hidden">
 
     <h1>
-        Vault Complete
+        VAULT OPENED
     </h1>
 
     <br>
@@ -558,7 +384,9 @@ img{
 
     <br>
 
-    <img id="bonusImage">
+    <img
+        id="bonusImage"
+        class="revealImage">
 
     <br><br>
 
@@ -584,3 +412,4 @@ img{
 
 </body>
 </html>
+```
