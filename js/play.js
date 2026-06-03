@@ -626,20 +626,16 @@ function processHack(){
 
     updateUI();
 
-    const hints =
-        buildHints(
-            guess,
-            secretCode
-        );
-
-    renderHints(
-        hints
-    );
-
-    addHistoryEntry(
+const hints =
+    buildHints(
         guess,
-        hints
+        secretCode
     );
+
+addHistoryEntry(
+    guess,
+    hints
+);
 
     if(
         guess ===
@@ -784,46 +780,6 @@ function buildHints(
 }
 
 /* ==========================================
-   HINT DISPLAY
-========================================== */
-
-function renderHints(
-    hints
-){
-
-    const row =
-        document.getElementById(
-            "hintRow"
-        );
-
-    if(!row){
-        return;
-    }
-
-    row.innerHTML = "";
-
-    hints.forEach(
-        colour=>{
-
-            const dot =
-                document.createElement(
-                    "div"
-                );
-
-            dot.className =
-          "hint " +
-          colour.toLowerCase();
-
-            row.appendChild(
-                dot
-            );
-
-        }
-    );
-
-}
-
-/* ==========================================
    ACCESS LOG
 ========================================== */
 
@@ -841,45 +797,36 @@ function addHistoryEntry(
         return;
     }
 
-    const entry =
+    const row =
         document.createElement(
             "div"
         );
 
-    entry.className =
+    row.className =
         "historyEntry";
 
-    const hintHTML =
-        hints.map(
-            hint=>{
+    const displayHints =
+        hints.map(hint=>{
 
-                if(
-                    hint === "GREEN"
-                ){
-                    return
-                    "<span class='green'>●</span>";
-                }
-
-                if(
-                    hint === "YELLOW"
-                ){
-                    return
-                    "<span class='yellow'>●</span>";
-                }
-
-                return
-                "<span class='grey'>●</span>";
-
+            if(hint === "GREEN"){
+                return "🟩";
             }
-        ).join("");
 
-    entry.innerHTML =
+            if(hint === "YELLOW"){
+                return "🟨";
+            }
 
-        `<span>${guess}</span>
-         <span>${hintHTML}</span>`;
+            return "⬜";
+
+        });
+
+    row.textContent =
+        guess +
+        "   " +
+        displayHints.join(" ");
 
     history.prepend(
-        entry
+        row
     );
 
 }
