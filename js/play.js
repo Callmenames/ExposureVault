@@ -811,8 +811,8 @@ function renderHints(
                 );
 
             dot.className =
-                "hintDot " +
-                colour.toLowerCase();
+          "hint " +
+          colour.toLowerCase();
 
             row.appendChild(
                 dot
