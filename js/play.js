@@ -476,6 +476,12 @@ function updateUI(){
         )
         .textContent =
         revealedPassword;
+   document
+    .getElementById(
+        "backgroundImage"
+    )
+    .style.backgroundImage =
+    `url(${stage.image})`;
 
    const statusBar =
     document.getElementById(
