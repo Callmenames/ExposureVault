@@ -1315,14 +1315,6 @@ function continueAfterReset(){
         history.innerHTML = "";
     }
 
-    const hintRow =
-        document.getElementById(
-            "hintRow"
-        );
-
-    if(hintRow){
-        hintRow.innerHTML = "";
-    }
 
     document
         .getElementById(
