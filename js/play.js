@@ -82,6 +82,9 @@ let unlockedImages = [];
 
 let processing = false;
 
+let decryptActive = false;
+let cautionActive = false;
+
 /* ==========================================
    INIT
 ========================================== */
@@ -165,7 +168,11 @@ function saveProgress(){
 
             secretCode,
 
-            unlockedImages
+            unlockedImages,
+           
+           decryptActive,
+         
+           cautionActive
 
         })
 
@@ -214,6 +221,12 @@ function loadProgress(){
 
                 unlockedImages =
                     data.unlockedImages || [];
+              
+               decryptActive =
+                   data.decryptActive || false;
+               
+               cautionActive =
+                   data.cautionActive || false;
 
             }
 
@@ -453,6 +466,38 @@ function updateUI(){
         )
         .textContent =
         revealedPassword;
+
+   const statusBar =
+    document.getElementById(
+        "statusBar"
+    );
+
+if(cautionActive){
+
+    statusBar.textContent =
+        "⚠ CAUTION ACTIVE";
+
+    statusBar.className =
+        "statusCaution";
+
+}
+else if(decryptActive){
+
+    statusBar.textContent =
+        "🔓 DECRYPT ACTIVE";
+
+    statusBar.className =
+        "statusDecrypt";
+
+}
+else{
+
+    statusBar.textContent = "";
+
+    statusBar.className =
+        "hidden";
+
+}
 
     document
         .getElementById(
@@ -877,6 +922,56 @@ function rollEvent(){
             )
         ];
 
+    /* DECRYPT CHECK */
+
+    if(decryptActive){
+
+        decryptActive = false;
+
+        if(result === "HACK"){
+
+            revealRandomLetters(3);
+
+            setResult(
+                "DECRYPT TRIGGERED • 3 LETTERS"
+            );
+
+            updateUI();
+
+            checkPasswordSolved();
+
+            return;
+        }
+
+    }
+
+    /* CAUTION CHECK */
+
+    if(cautionActive){
+
+        cautionActive = false;
+
+        if(result === "ALARM"){
+
+            alarms -= 3;
+
+            if(alarms < 0){
+                alarms = 0;
+            }
+
+            setResult(
+                "CAUTION FAILED • -3 ALARMS"
+            );
+
+            updateUI();
+
+            checkLockdown();
+
+            return;
+        }
+
+    }
+
     resolveEvent(
         result
     );
@@ -907,22 +1002,20 @@ function resolveEvent(
             );
 
             setResult(
-                "HACK SUCCESS"
+                "HACKED"
             );
 
             break;
 
-        case "DECRYPT":
+case "DECRYPT":
 
-            revealRandomLetters(
-                3
-            );
+    decryptActive = true;
 
-            setResult(
-                "DECRYPT SUCCESS"
-            );
+    setResult(
+        "DECRYPT"
+    );
 
-            break;
+    break;
 
         case "SAFE":
 
@@ -937,7 +1030,7 @@ function resolveEvent(
             alarms--;
 
             setResult(
-                "ALARM TRIGGERED"
+                "ALARM"
             );
 
             break;
@@ -952,11 +1045,15 @@ function resolveEvent(
 
             break;
 
-        case "CAUTION":
-
-            processCaution();
-
-            break;
+      case "CAUTION":
+      
+          cautionActive = true;
+      
+          setResult(
+              "CAUTION"
+          );
+      
+          break;
 
     }
 
