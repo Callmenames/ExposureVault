@@ -15,49 +15,59 @@ const STORAGE_KEY =
 
 const eventPools = [
 
-    [
-        ...Array(12).fill("HACK"),
-        ...Array(3).fill("DECRYPT"),
-        ...Array(4).fill("SAFE"),
-        ...Array(2).fill("DIFFUSE"),
-        ...Array(1).fill("ALARM"),
-        ...Array(1).fill("CAUTION")
-    ],
-
-    [
-        ...Array(10).fill("HACK"),
-        ...Array(3).fill("DECRYPT"),
-        ...Array(4).fill("SAFE"),
-        ...Array(2).fill("DIFFUSE"),
-        ...Array(3).fill("ALARM"),
-        ...Array(2).fill("CAUTION")
-    ],
-
-    [
-        ...Array(8).fill("HACK"),
-        ...Array(3).fill("DECRYPT"),
-        ...Array(3).fill("SAFE"),
-        ...Array(2).fill("DIFFUSE"),
-        ...Array(5).fill("ALARM"),
-        ...Array(3).fill("CAUTION")
-    ],
-
-    [
-        ...Array(7).fill("HACK"),
-        ...Array(3).fill("DECRYPT"),
-        ...Array(3).fill("SAFE"),
-        ...Array(1).fill("DIFFUSE"),
-        ...Array(7).fill("ALARM"),
-        ...Array(4).fill("CAUTION")
-    ],
-
+    // Stage 1
     [
         ...Array(6).fill("HACK"),
         ...Array(2).fill("DECRYPT"),
+        ...Array(3).fill("SAFE"),
+        ...Array(2).fill("DIFFUSE"),
+
+        ...Array(9).fill("ALARM"),
+        ...Array(4).fill("CAUTION")
+    ],
+
+    // Stage 2
+    [
+        ...Array(5).fill("HACK"),
+        ...Array(2).fill("DECRYPT"),
+        ...Array(3).fill("SAFE"),
+        ...Array(2).fill("DIFFUSE"),
+
+        ...Array(11).fill("ALARM"),
+        ...Array(5).fill("CAUTION")
+    ],
+
+    // Stage 3
+    [
+        ...Array(4).fill("HACK"),
+        ...Array(2).fill("DECRYPT"),
         ...Array(2).fill("SAFE"),
         ...Array(1).fill("DIFFUSE"),
-        ...Array(9).fill("ALARM"),
-        ...Array(5).fill("CAUTION")
+
+        ...Array(13).fill("ALARM"),
+        ...Array(6).fill("CAUTION")
+    ],
+
+    // Stage 4
+    [
+        ...Array(3).fill("HACK"),
+        ...Array(1).fill("DECRYPT"),
+        ...Array(2).fill("SAFE"),
+        ...Array(1).fill("DIFFUSE"),
+
+        ...Array(15).fill("ALARM"),
+        ...Array(8).fill("CAUTION")
+    ],
+
+    // Stage 5
+    [
+        ...Array(2).fill("HACK"),
+        ...Array(1).fill("DECRYPT"),
+        ...Array(1).fill("SAFE"),
+        ...Array(1).fill("DIFFUSE"),
+
+        ...Array(18).fill("ALARM"),
+        ...Array(10).fill("CAUTION")
     ]
 
 ];
