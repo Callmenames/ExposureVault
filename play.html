@@ -290,6 +290,8 @@ button{
 </head>
 <body>
 
+<div id="backgroundImage"></div>
+
 <div class="container">
 
     <!-- LOADING -->
@@ -333,154 +335,58 @@ button{
 
     </div>
 
-    <!-- GAME -->
+<!-- GAME -->
 
-    <div
-        id="gameScreen"
-        class="hidden">
-        <div id="backgroundImage"></div>
-        <div class="card">
+<div
+    id="gameScreen"
+    class="hidden">
 
-            <h2
-                id="stageTitle"
-                class="stageTitle">
+    <div class="card">
 
-                Stage 1 / 5
+        <h2
+            id="stageTitle"
+            class="stageTitle">
+        </h2>
 
-            </h2>
+        <div
+            id="statusBar"
+            class="hidden">
+        </div>
 
-            <div
-                id="difficultyDisplay"
-                class="difficulty">
+        <div
+            id="passwordDisplay"
+            class="passwordDisplay">
 
-                EASY
+            ********
 
-            </div>
+        </div>
 
-            <div
-                id="statusBar"
-                class="hidden">
-            </div>
+        <div
+            id="alarmContainer"
+            class="alarmContainer">
+        </div>
 
-            <div
-                id="passwordDisplay"
-                class="passwordDisplay">
+        <div
+            id="codeDisplay"
+            class="codeDisplay">
 
-                ********
+            ----
 
-            </div>
+        </div>
 
-            <div
-                id="alarmContainer"
-                class="alarmContainer">
-
-            </div>
+        <div class="progressBar">
 
             <div
-                id="codeDisplay"
-                class="codeDisplay">
-
-                ----
-
-            </div>
-
-            <div
-                id="hintRow"
-                class="hints">
-            </div>
-
-            <div class="progressBar">
-
-                <div
-                    id="progressFill"
-                    class="progressFill">
-
-                </div>
-
-            </div>
-
-            <div class="keypad">
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('1')">1</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('2')">2</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('3')">3</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('4')">4</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('5')">5</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('6')">6</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('7')">7</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('8')">8</button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('9')">9</button>
-
-                <button
-                    class="clearBtn"
-                    onclick="clearCode()">
-
-                    C
-
-                </button>
-
-                <button
-                    class="numberBtn"
-                    onclick="pressDigit('0')">0</button>
-
-                <button
-                    id="hackButton"
-                    class="hackBtn"
-                    onclick="hack()">
-
-                    HACK
-
-                </button>
-
-            </div>
-
-            <div
-                id="resultBox"
-                class="resultBox">
-
-            </div>
-
-            <div class="history">
-
-                <h3>
-                    Access Log
-                </h3>
-
-                <div
-                    id="historyList"
-                    class="historyList">
-
-                </div>
-
+                id="progressFill"
+                class="progressFill">
             </div>
 
         </div>
+
+        <div class="keypad">
+
+            <button
+               
 
         <!-- GALLERY -->
 
