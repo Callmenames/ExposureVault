@@ -441,28 +441,30 @@ function updateUI(){
         gameData.stages[
             currentStage
         ];
+   
+   document
+    .getElementById(
+        "backgroundImage"
+    )
+    .style.backgroundImage =
+    `url(${stage.image})`;
 
-    document
-        .getElementById(
-            "stageTitle"
-        )
-        .textContent =
+document
+    .getElementById(
+        "stageTitle"
+    )
+    .textContent =
 
-        `Stage ${
-            currentStage + 1
-        } / ${
-            gameData.stages.length
-        }`;
-
-    document
-        .getElementById(
-            "difficultyDisplay"
-        )
-        .textContent =
+    `Stage ${
+        currentStage + 1
+    }/${
+        gameData.stages.length
+    } • ${
         (
             stage.difficulty ||
             "easy"
-        ).toUpperCase();
+        ).toUpperCase()
+    }`;
 
     document
         .getElementById(
